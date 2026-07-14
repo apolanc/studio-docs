@@ -1,5 +1,5 @@
 ---
-title: "Define Your Agent with Maestro"
+title: "Define Your Maestro Agent: Flows, Domain, and Config"
 sidebarTitle: "Agent Definition"
 description: "Learn how flows, domain, and config files work together to define a Maestro agent — and why flow descriptions are the key to accurate routing."
 ---
@@ -147,13 +147,13 @@ language: en
 pipeline:
   - name: CompactLLMCommandGenerator
     llm:
-      model_name: gpt-4o
+      model_group: openai_llm
 
 policies:
   - name: FlowPolicy
 ```
 
-You can swap `gpt-4o` for any supported model. Rasa also supports fine-tuned smaller models (such as Llama 8B) for lower latency and predictable hosting costs.
+The `model_group` value refers to a named group defined in your `endpoints.yml` under `model_groups`. Rasa also supports fine-tuned smaller models (such as Llama 8B) for lower latency and predictable hosting costs — see [Configure Your Agent](/pro/guides/configure-your-agent) for LLM provider setup.
 
 <Note>
   A full Maestro sub-agent configuration example — including how to register agents by name in `endpoints.yml` and reference them from flows — will be added when the complete Maestro multi-agent API is released.

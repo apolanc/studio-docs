@@ -1,5 +1,5 @@
 ---
-title: "Get Started with Rasa Pro in 10 Minutes"
+title: "Rasa Pro Quickstart: Run Your First CALM Agent Fast"
 sidebarTitle: "Quickstart"
 description: "Install Rasa Pro, scaffold a CALM agent project, train your first model, and hold your first real conversation — all in under 10 minutes."
 ---
@@ -118,7 +118,7 @@ rasa train
 Training typically takes one to three minutes. You'll see a `models/` directory created when it completes.
 
 <Note>
-  The tutorial template uses a fine-tuned LLM hosted by Rasa, so you don't need an LLM provider API key for this quickstart. For your own projects, set an `OPENAI_API_KEY` or configure a different provider in `config.yml`.
+  The `calm` template defaults to OpenAI. Set an `OPENAI_API_KEY` environment variable before running `rasa train`, or configure a different LLM provider in `config.yml`.
 </Note>
 
 </Step>

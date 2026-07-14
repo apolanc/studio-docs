@@ -154,6 +154,22 @@ nlg:
 
 The rephraser uses the `model_group` you configure for it and preserves the intent and key facts from your original response template.
 
+### Lock store
+
+The `lock_store` prevents race conditions when multiple messages for the same user arrive at the same time. For a single Rasa process the in-memory default is sufficient; for multi-worker or multi-pod deployments use `RedisLockStore` or `ConcurrentRedisLockStore`.
+
+### Vector store
+
+If your assistant uses Enterprise Search Policy, the `vector_store` defines where vector embeddings of your source documents are stored. It also supports connecting to a search API that returns relevant documents for a query.
+
+### A2A server
+
+When an external orchestrator calls your assistant over the [Agent-to-Agent (A2A) protocol](https://a2a-protocol.org/latest/), add an `a2a_server` block to `endpoints.yml`. This exposes Rasa as a sub-agent that external systems can discover and invoke.
+
+### Models
+
+The `models` section configures remote model storage — for example a cloud bucket — so Rasa can fetch the latest trained model at startup without a local file copy. This is useful in CI/CD pipelines where models are built and uploaded separately.
+
 ---
 
 ## domain.yml — Responses, slots, and actions

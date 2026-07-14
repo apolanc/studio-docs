@@ -1,5 +1,5 @@
 ---
-title: "Set Up Rasa MCP Tools for IDE Copilots"
+title: "Connect Your IDE Copilot to Rasa Pro with MCP Tools"
 sidebarTitle: "MCP Tools"
 description: "Connect Cursor, VS Code, Claude Code, or JetBrains to your Rasa project so your IDE copilot can build, validate, and debug your agent in natural language."
 ---
@@ -17,6 +17,7 @@ Rasa MCP Tools is included in **Rasa Pro 3.16 and later**. There is no separate 
 | **Validate** | "Validate my project and explain any errors." |
 | **Train** | "Train the model and tell me if it succeeded." |
 | **Test** | "Send 'I want to transfer money' to the assistant." |
+| **Evaluate** | "Generate and run scenarios for the transfer_money flow." |
 | **Debug** | "Get the assistant logs and explain why the flow was cancelled." |
 | **Learn** | "Search the Rasa docs for how slot validation works." |
 
@@ -258,6 +259,21 @@ Get the assistant logs and explain why the flow was cancelled.
   </Accordion>
   <Accordion title="IDE says 'no MCP servers found'">
     Check that your MCP config file exists in the correct location and contains valid JSON. Expected locations: Cursor → `.cursor/mcp.json`, VS Code → `.vscode/mcp.json`, Claude Code → `.mcp.json` or `~/.claude.json`. Reload or restart MCP in your IDE after making changes.
+  </Accordion>
+  <Accordion title="Project folder not configured">
+    Run `rasa tools init` from your project root, or add `--project-path /path/to/your/project` to the `args` list in your MCP server config. The MCP server must know where your project files are.
+  </Accordion>
+  <Accordion title="evaluate_agent fails to fetch tracker">
+    The evaluation tool requires the Rasa REST API. Start your server with `rasa run --inspect`. The `--inspect` flag enables the REST API automatically — you do not need `--enable-api` separately.
+  </Accordion>
+  <Accordion title="Offline documentation is stale">
+    Run `rasa tools init docs` from your project root to refresh the offline docs cache, then restart the MCP server from your IDE.
+  </Accordion>
+  <Accordion title="Validation or training hangs">
+    Large projects can take 60 seconds or more. If it appears stuck, check your terminal for error output. Cancel and retry if needed.
+  </Accordion>
+  <Accordion title="rasa-simulating-conversations skill not loading">
+    Open your IDE from the root directory of your Rasa project. Skills are scoped to the project root and will not load if you open a parent or unrelated directory. Run `rasa tools init` and select the option to install Rasa agent skills, then restart your IDE.
   </Accordion>
 </AccordionGroup>
 

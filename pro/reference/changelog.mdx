@@ -1,7 +1,7 @@
 ---
-title: "Rasa Pro Release Notes and Changelog"
+title: "Rasa Pro Changelog: Release Notes and Version History"
 sidebarTitle: "Changelog"
-description: "A running record of new features, improvements, and fixes across every Rasa Pro release — most recent version first."
+description: "Complete Rasa Pro release history: new features, improvements, and bug fixes for every version, starting with the most recent release."
 ---
 
 This page tracks new features, improvements, and fixes across Rasa Pro releases. The most recent release appears first.
@@ -32,6 +32,8 @@ Studio now ships with a built-in analytics dashboard — no external setup or th
 - CSAT score
 
 Containment insights highlight the user journeys with the lowest containment rates so you know exactly where to focus improvement efforts.
+
+Conversation Review gains new filters for **channel**, **language**, and **tag**. The filter model is additive — stack all three or use just one. Reset clears everything at once, so the conversations that previously required manual scrolling to find are now a few clicks away.
 
 ---
 
@@ -75,7 +77,6 @@ Sessions received a full overhaul in this release:
 - Every session now carries a **UUID on all events**, giving tracking and analytics a reliable identifier
 - Sessions end with explicit states: `ConversationInactive` (the session is resumable) or `SessionEnded` (the session is permanently closed) — rather than timing out ambiguously
 - A new `start_session_after_expiry` config option controls behavior when a session expires
-- A new admin endpoint `GET /users/{user_id}/trackers` provides paginated conversation history per user
 
 ---
 
@@ -83,8 +84,10 @@ Sessions received a full overhaul in this release:
 
 ASR and TTS now reconfigure at runtime based on the built-in language slot, so a single Rasa deployment can support multiple languages without requiring a separate deployment per language.
 
+This release also upgrades audio quality from 8 kHz mu-law to Linear PCM at 24 kHz on AudioCodes and Jambonz, and 48 kHz for Browser and Studio — no configuration required.
+
 </Update>
 
-<Update label="Coming soon" description="">
-  Future release notes will appear here as new versions ship.
+<Update label="Coming soon" description="Future releases">
+  Release notes for upcoming versions will appear here as new versions ship.
 </Update>

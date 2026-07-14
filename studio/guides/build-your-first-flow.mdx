@@ -1,7 +1,7 @@
 ---
-title: "Build Conversational Flows in Rasa Studio"
+title: "Build Conversational Flows in Rasa Studio | Studio Guides"
 sidebarTitle: "Build Flows"
-description: "Learn how to build modular, reusable conversational flows in Rasa Studio using the visual step-by-step flow builder powered by CALM."
+description: "Learn how to build conversational flows in Rasa Studio using the visual flow builder powered by CALM, covering all step types and system flows."
 ---
 
 Flows are the building blocks of every Rasa assistant. Each flow encapsulates a single unit of business logic—one task your assistant knows how to handle, such as transferring money, resetting a password, or collecting feedback. The visual flow builder in Rasa Studio lets you compose these tasks step by step without writing YAML by hand, while the underlying CALM (Conversational AI with Language Models) engine decides when to trigger each flow based on what the user says.
@@ -19,37 +19,30 @@ flows:
       Ask all the required questions to process a money transfer
       request from users.
     steps:
-      - id: collect_recipient
-        collect: recipient
+      - collect: recipient
         description: This step inquires about the recipient of the payment.
         ask_before_filling: false
-        next:
-          - id: collect_amount
-      - id: collect_amount
-        collect: amount
+      - collect: amount
         description: This step inquires about the amount of the payment, in US Dollars.
         ask_before_filling: false
+      - action: action_validate_sufficient_funds
         next:
-          - id: check_funds
-      - id: check_funds
-        action: action_validate_sufficient_funds
-        next:
-          - if: has_sufficient_funds
-            then: confirm_transfer
-          - else: insufficient_funds_msg
-      - id: confirm_transfer
-        collect: final_confirmation
+          - if: not slots.has_sufficient_funds
+            then:
+              - action: utter_insufficient_funds
+                next: END
+          - else: confirm_transfer
+      - collect: final_confirmation
+        id: confirm_transfer
         ask_before_filling: true
         next:
-          - if: final_confirmation
-            then: success_msg
-          - else: cancel_msg
-      - id: success_msg
-        action: utter_transfer_successful
-      - id: insufficient_funds_msg
-        action: utter_insufficient_funds
-      - id: cancel_msg
-        action: utter_cancel_transfer
+          - if: not slots.final_confirmation
+            then:
+              - action: utter_cancel_transfer
+                next: END
+          - else: success_msg
+      - action: utter_transfer_successful
+        id: success_msg
 ```
 
 ## Step types

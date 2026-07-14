@@ -1,5 +1,5 @@
 ---
-title: "Write Custom Actions for Your Rasa Agent"
+title: "Build and Run Custom Actions in Your Rasa Pro Agent"
 sidebarTitle: "Custom Actions"
 description: "Build Python custom actions to call APIs, query databases, and run business logic as steps inside your Rasa Pro conversation flows."
 ---
@@ -185,9 +185,10 @@ class ActionFetchAccountBalance(Action):
 ```
 
 <Tip>
-  Prefer returning a named `utter_*` response via `SlotSet` plus flow branching
-  over calling `dispatcher.utter_message()` directly — named responses are
-  easier to validate, translate, and A/B test.
+  Prefer defining error and fallback messages as named `utter_*` responses in
+  `domain.yml` and triggering them via flow branching, rather than calling
+  `dispatcher.utter_message()` with inline text. Named responses are easier to
+  validate, translate, and A/B test.
 </Tip>
 
 ---

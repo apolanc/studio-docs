@@ -1,5 +1,5 @@
 ---
-title: "Conversation Patterns: Built-in Recovery in CALM"
+title: "Conversation Patterns: Built-in Recovery Flows in CALM"
 sidebarTitle: "Conversation Patterns"
 description: "Conversation patterns are pre-built system flows that keep your agent on track when users interrupt, correct themselves, or go off-script."
 ---
@@ -42,11 +42,11 @@ Handles the case where a user corrects information they provided earlier. For ex
 
 ### `pattern_chitchat`
 
-Handles small talk — greetings, jokes, questions about the agent's identity — that fall outside any business flow. By default, the Contextual Response Rephraser generates a natural reply. You can customize the response or add conditions to limit what the agent engages with.
+Handles small talk — greetings, jokes, questions about the agent's identity — that fall outside any business flow. By default, the pattern responds with the templated `utter_cannot_handle` response. You can customize this by replacing the default action with one that generates a more natural reply, or by enabling the Contextual Response Rephraser for this pattern. You can also add conditions to limit what the agent engages with.
 
 ### `pattern_customer_satisfaction`
 
-Triggered automatically after `pattern_completed`. Collects a `csat_score` slot from the user. Disabled by default — you enable it by adding the flow to your project. Connecting the score to your analytics or CRM typically requires a custom action.
+Triggered automatically after `pattern_completed` when the user indicates they are done with the session. Collects a `csat_score` slot from the user (categorical: `satisfied` or `unsatisfied`) and responds with an appropriate thank-you message. The pattern is included out of the box — no configuration is required to activate it. It fires at most once per session. Connecting the score to your analytics or CRM typically requires a custom action.
 
 ## How CALM activates patterns
 
