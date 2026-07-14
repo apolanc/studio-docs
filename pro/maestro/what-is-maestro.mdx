@@ -1,0 +1,69 @@
+---
+title: "What is Maestro? Rasa's Agent Orchestration Engine"
+sidebarTitle: "What is Maestro"
+description: "Maestro is Rasa Pro's orchestration engine. It coordinates agents, tools, and knowledge sources in one conversational deployment — built on CALM."
+---
+
+Maestro is Rasa Pro's agent orchestration engine. It coordinates flows, MCP tools, A2A sub-agents, and knowledge retrieval within a single conversational deployment — routing each user request to the right resource at the right moment, maintaining session state across all of them, and keeping the experience consistent whether users arrive over chat or voice.
+
+Maestro is not a separate product. It is built into Rasa Pro as a first-class capability that extends the CALM dialogue system upward to multi-agent coordination. You configure it through the same `config.yml`, `flows.yml`, and `endpoints.yml` files you already use.
+
+## The three roles Maestro plays
+
+Every turn in a conversation requires three things: a decision about what to do next, a record of everything learned so far, and an understanding of what this interaction actually means. Maestro handles all three.
+
+### Directing control
+
+At each turn, Maestro decides what happens next. It evaluates the active flow state, the user's intent, available tools, and connected agents, then chooses between:
+
+- **Activating a flow** — start or resume a structured CALM flow for a well-defined task
+- **Calling an MCP tool** — invoke an external service (database, API, third-party system) via the Model Context Protocol
+- **Invoking an A2A agent** — delegate to a specialist sub-agent over the Agent-to-Agent protocol
+- **Retrieving knowledge** — answer with context from a connected RAG source
+- **Falling back** — handle unexpected input gracefully without abandoning the session
+
+### Maintaining state
+
+Maestro tracks everything relevant to the current session: conversation slots, tool call outcomes, pending goals, and which agents or flows are currently active. This persistent awareness means a user can switch topics mid-conversation, complete a sub-task handled by a specialist agent, and return to the original flow without losing context.
+
+### Framing context
+
+Before acting, Maestro evaluates the interaction from the outside in. It understands the channel (voice versus chat), detects intent ambiguity, checks the user's status against business rules, and applies any system-level constraints your deployment enforces. This framing ensures that routing decisions are always appropriate to the full situation — not just the last message.
+
+## How Maestro relates to CALM
+
+CALM (Conversational AI with Language Models) is the dialogue system at the heart of Rasa Pro. It handles a single conversation flow: understanding what the user wants, executing the business logic defined in that flow, and producing a response.
+
+Maestro is the orchestration layer that sits on top of CALM. Where CALM governs execution within a flow, Maestro governs the relationship between flows, tools, and agents across the whole session. You can think of it this way:
+
+| Layer | Responsibility |
+|---|---|
+| CALM | Understands user input; executes a single flow |
+| Maestro | Decides which flow, tool, or agent to activate; coordinates multiple resources; maintains cross-session state |
+
+Every Maestro deployment is a CALM deployment — you do not replace one with the other. You build your flows and domain with CALM primitives and let Maestro coordinate them at the session level.
+
+## When to use Maestro
+
+Maestro is well-suited to any deployment where a single agent needs to draw from more than one source of capability:
+
+- **Customer support with domain specialists** — a front-line agent routes billing queries to a billing sub-agent, technical issues to a support sub-agent, and account questions to an account management flow, all within one customer session
+- **Unified voice and chat experience** — the same underlying agents serve both channels; Maestro adjusts behaviour for modality (for example, sending filler messages during tool calls in voice)
+- **Multi-step workflows spanning external APIs** — an agent collects user input across several turns, calls backend services at appropriate points, and assembles a final response from multiple tool results
+
+## Get started
+
+<CardGroup cols={2}>
+  <Card title="Getting Started with Maestro" icon="rocket" href="/pro/maestro/getting-started">
+    Set up your first orchestrated agent in Rasa Pro.
+  </Card>
+  <Card title="Rasa Pro Introduction" icon="layer-group" href="/pro/introduction">
+    Understand the full Rasa Pro platform and what it offers.
+  </Card>
+  <Card title="What is CALM" icon="brain" href="/pro/concepts/calm">
+    Learn about the dialogue system that powers every Maestro agent.
+  </Card>
+  <Card title="Agent Definition" icon="file-code" href="/pro/maestro/agent-definition">
+    Define flows, domain, and configuration for your Maestro agent.
+  </Card>
+</CardGroup>

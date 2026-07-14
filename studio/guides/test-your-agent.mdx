@@ -1,0 +1,116 @@
+---
+title: "Test and Debug Your Agent in Rasa Studio"
+sidebarTitle: "Test Your Agent"
+description: "Train your Rasa assistant in Studio, run live test conversations in the chat panel, and use Inspector mode to debug flows and slots."
+---
+
+Before your assistant reaches real users, you need to verify that it triggers the right flows, collects the right slots, and follows the correct logic branches. Rasa Studio provides a built-in training pipeline and an interactive test panel—called **Try Your Assistant**—so you can iterate quickly without leaving the browser. For deeper debugging, **Inspector mode** overlays real-time state information on every turn, showing you exactly what the CALM engine sees at each step.
+
+## Train before you test
+
+Every time you make a meaningful change to a flow—adding a step, editing a slot, updating a description—you need to re-train the model before those changes are reflected in the test panel. Studio handles the full training pipeline in-browser, so you do not need a local Rasa installation for most iteration cycles.
+
+<Steps>
+  <Step title="Open the Train panel">
+    In the flow builder, click the **Train** button in the top navigation bar. The training side panel opens.
+  </Step>
+  <Step title="Select flows to include">
+    Check the flows you want included in this training run. NLU data, responses, and all other domain primitives are always included automatically.
+
+    If you use flow versioning and have saved stable versions, use the **Draft / Stable** toggle to choose which version of each flow to train against.
+  </Step>
+  <Step title="Start training">
+    Click **Start training**. Studio validates all selected flows before the training process begins—catching issues like missing responses, invalid slot references, or broken step connections.
+  </Step>
+  <Step title="Resolve validation errors">
+    If validation fails, an **Unable to train** message appears with a list of affected flows. Click a flow name in the list to jump directly to the problematic step. Fix the issue, then click **Start training** again.
+  </Step>
+  <Step title="Wait for completion">
+    A progress indicator shows the training status. Other users can view the status but cannot start a new training run until the current one finishes. A green checkmark confirms a successful build.
+  </Step>
+</Steps>
+
+<Note>
+  If training fails after validation passes, go to the **Versions** page, click the ellipsis next to the failed version, and download the training logs. Typical causes include conflicting training data or a misconfigured action endpoint.
+</Note>
+
+## Test your assistant in the Try Your Assistant panel
+
+Once training succeeds, open the **Try Your Assistant** panel to start a live test conversation against the freshly trained model.
+
+<Steps>
+  <Step title="Navigate to Try Your Assistant">
+    Click **Try your assistant** in the left navigation, or click the **Try your assistant** shortcut that appears on the training success banner.
+  </Step>
+  <Step title="Start a conversation">
+    Type a message in the chat input as if you were a user. The assistant responds using the trained model.
+  </Step>
+  <Step title="Explore different scenarios">
+    Work through your intended happy path first—for example, a complete money transfer from start to finish. Then test edge cases: providing an out-of-range amount, interrupting mid-flow, or asking an off-topic question.
+  </Step>
+  <Step title="Reset the conversation">
+    Click the reset icon at the top of the chat panel to start a fresh session without the previous slot values. Always reset between unrelated test scenarios so residual slot values do not affect results.
+  </Step>
+</Steps>
+
+## Debug with Inspector mode
+
+Inspector mode is the most powerful tool for understanding why the assistant behaved a certain way. It overlays a real-time state panel alongside the chat that shows the active flow, the current step, and the current value of every slot in the domain.
+
+<Steps>
+  <Step title="Enable Inspector mode">
+    In the Try Your Assistant panel, toggle **Inspector mode** in the top-right corner of the chat panel. The inspector sidebar expands next to the conversation.
+  </Step>
+  <Step title="Read the active flow and step">
+    After each turn, the inspector shows which flow is currently active and which step was just executed. If the wrong flow is active, the issue is likely in the flow description or a flow guard configuration.
+  </Step>
+  <Step title="Check slot values">
+    The inspector lists every slot and its current value. Verify that slots are being filled with the values you expect. A slot showing `null` after a Collect information step means the extraction failed.
+  </Step>
+  <Step title="Trace logic branches">
+    When a Logic step runs, the inspector shows which condition evaluated to true. If the wrong branch was taken, inspect the condition definition and the slot values that were active at that point.
+  </Step>
+</Steps>
+
+{/* TODO: Add screenshot of Inspector mode showing active flow, step, and slot values panel */}
+
+## What to check during testing
+
+Use the following checklist to structure your test sessions:
+
+**Flow triggering**
+- Send a message that should activate the flow. Does the correct flow start?
+- Send an ambiguous message. Does the assistant ask for clarification rather than triggering the wrong flow?
+- If a flow guard is set to *"Start exclusively via links"*, confirm the flow does not trigger when addressed directly.
+
+**Slot collection**
+- Provide the requested information explicitly. Is the slot filled with the correct value and type?
+- Provide information upfront before being asked (for example, *"I want to send $200 to Alice"*). Are `amount` and `recipient` extracted without asking again?
+- Enable **Ask before filling** on a slot and verify the assistant still asks even if the slot was pre-filled.
+
+**Logic branching**
+- Trigger each branch of every Logic step intentionally and confirm the correct steps follow.
+- Test boundary conditions—for example, an amount of exactly `1000` when the condition is `amount is less_than_or_equal 1000`.
+
+**System flows**
+- Complete a flow and verify `pattern_completed` runs correctly.
+- Interrupt a flow mid-conversation and confirm the assistant handles the context switch gracefully.
+
+## Common issues and fixes
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| Flow never triggers | Flow description is too vague or duplicates another flow's description | Rewrite the description to be more specific and unique |
+| Slot is not collected | Slot type mismatch (for example, `Text` for a number) | Change the slot type to match the expected data |
+| Wrong logic branch taken | Condition references the wrong slot or uses the wrong operator | Open the Logic step and correct the condition |
+| `pattern_completed` fires unexpectedly after greeting | System flow logic not customized | Add a Logic step in `pattern_completed` to skip it after specific flows |
+| Training fails after validation passes | Action endpoint is unreachable or action name does not match the server | Confirm the action server URL in **Assistant settings → Configuration** and that the action name is registered |
+
+<CardGroup cols={2}>
+  <Card title="Build Flows" icon="diagram-project" href="/studio/guides/build-your-first-flow">
+    Go back to the flow builder to fix issues uncovered during testing.
+  </Card>
+  <Card title="Git Connect" icon="code-branch" href="/studio/guides/git-connect">
+    Download your project and train locally for advanced debugging scenarios.
+  </Card>
+</CardGroup>

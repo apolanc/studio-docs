@@ -1,0 +1,77 @@
+---
+title: "What is Rasa Studio 2.0? Visual Agent Builder"
+sidebarTitle: "What is Studio"
+description: "Rasa Studio 2.0 is a no-code visual interface for building, testing, and managing AI agents—designed for both business teams and developers."
+---
+
+Rasa Studio 2.0 is a visual, no-code interface that lets you build, test, and manage AI agents running on the Rasa platform. Whether you're a conversation designer shaping dialogue logic or a developer looking to speed up iteration cycles, Studio gives your entire team a shared workspace—no deep technical expertise required to get started.
+
+## Who is Studio for?
+
+Studio is built for any team that wants to deliver great conversational experiences without juggling raw configuration files every step of the way. Think of it as an advanced content management system for conversational AI: you work visually on the same assistant your engineering team deploys.
+
+### Business users and conversation designers
+
+You can bring your ideas to life directly in Studio. Craft business logic, fine-tune responses, and run tests—all without writing code. Studio keeps you focused on the conversation experience rather than implementation details.
+
+### Technical teams
+
+Studio adds a visual layer on top of your Rasa project, simplifying collaboration and shortening the feedback loop. You can export any assistant as YAML/code at any time, import existing Rasa-compatible projects, and keep full control over integration, customization, and deployment.
+
+## Key capabilities
+
+<CardGroup cols={2}>
+  <Card title="Visual Flow Builder" icon="diagram-project">
+    Design conversation flows by connecting steps on a drag-and-drop canvas. Each flow maps to a [CALM](/pro/concepts/calm)-based dialogue structure you can inspect and export as code.
+  </Card>
+  <Card title="Response Management" icon="message-lines">
+    Create, organize, and translate assistant responses in one place. Use the contextual response rephraser to make messages sound natural without hand-crafting every variation.
+  </Card>
+  <Card title="Train & Test" icon="flask">
+    Trigger model training from the Studio UI, select which flows to include, and immediately test your assistant in the built-in **Try Your Assistant** panel—no CLI required.
+  </Card>
+  <Card title="Analytics" icon="chart-line">
+    Track flow performance, monitor drop-off points, and measure success rates across channels through the Conversation Analytics Pipeline.
+  </Card>
+  <Card title="Git Integration" icon="code-branch">
+    Download your assistant as structured YAML files via the Rasa CLI. Flows, domain, config, and endpoints are all version-controllable from day one.
+  </Card>
+  <Card title="Multi-language Support" icon="globe">
+    Configure additional languages in Assistant Settings and manage localized responses directly inside Studio—no manual config edits needed.
+  </Card>
+</CardGroup>
+
+## How Studio relates to Rasa Pro
+
+Studio runs **on top of** Rasa Pro, the underlying AI agent platform. Every flow you build in Studio compiles down to the same YAML structure used by Rasa Pro, which means:
+
+- You can switch between the visual builder and raw YAML at any time.
+- Custom actions, LLM configurations, and advanced pipeline settings live in `config.yml` and `endpoints.yml`, editable in **Assistant Settings → Configuration**.
+- Deployments happen through Rasa Pro—Studio is the authoring surface.
+
+<Note>
+  To use Studio, you need a running Rasa Pro instance. Studio connects to it via the Studio URL you configure during installation.
+</Note>
+
+## CALM: the dialogue system underneath
+
+Every agent you build in Studio is powered by **CALM** (Conversational AI with Language Models), Rasa's structured dialogue framework. CALM combines deterministic flows with LLM-driven natural language understanding, so your agents stay on track even when users take unexpected detours. Flows you design visually in Studio map directly to CALM primitives like `collect` steps, `logic` branches, and `link` steps.
+
+Learn more about how CALM works: [CALM concepts →](/pro/concepts/calm)
+
+## Get started
+
+<CardGroup cols={2}>
+  <Card title="Quickstart" icon="rocket" href="/studio/quickstart">
+    Build and test your first working agent in under 20 minutes.
+  </Card>
+  <Card title="Build Your First Flow" icon="hammer" href="/studio/guides/build-your-first-flow">
+    Deep dive into flow steps, slot types, logic branches, and more.
+  </Card>
+  <Card title="Studio & Rasa Pro" icon="layer-group" href="/pro/concepts/calm">
+    Understand how Studio, Rasa Pro, and CALM fit together.
+  </Card>
+  <Card title="Set Up Your Assistant" icon="gear" href="/studio/quickstart">
+    Configure LLMs, endpoints, and languages for your project.
+  </Card>
+</CardGroup>

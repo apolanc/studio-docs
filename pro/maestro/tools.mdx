@@ -1,0 +1,148 @@
+---
+title: "Connect Tools to Your Maestro Agent"
+sidebarTitle: "Tools"
+description: "Extend your Maestro agent with MCP tools, A2A sub-agents, and custom Python actions — and configure voice-ready filler messages for tool calls."
+---
+
+Maestro can route beyond its own flows to reach external systems and specialist agents. This page covers the three extension points: MCP tools for external service calls, A2A agents for delegating to other AI agents, and custom Python actions for anything else. It also covers filler messages — the acknowledgment responses Maestro sends in voice deployments while tools execute.
+
+## MCP tools
+
+[Model Context Protocol (MCP)](https://modelcontextprotocol.io/docs/getting-started/intro) is an open standard for connecting AI agents to external tools and data sources. Any MCP-compatible server — a database, an API, a document store — can become a callable tool inside your Maestro agent.
+
+MCP tools are surfaced as action steps inside flows. When Maestro reaches an `action` step that maps to an MCP tool, it calls the tool server, waits for the result, and continues the flow with the returned data available as slot values.
+
+### Configure the action server endpoint
+
+Your MCP tool server runs alongside the action server. Register its address in `endpoints.yml`:
+
+```yaml endpoints.yml
+action_endpoint:
+  url: http://localhost:5055/webhook
+```
+
+The action server at that address handles both custom Python actions and MCP tool calls when configured to do so.
+
+### Use an MCP tool in a flow
+
+Reference MCP tools the same way you reference custom actions — as `action_*` steps:
+
+```yaml data/flows.yml
+flows:
+  check_order_status:
+    description: Look up the status of a user's order by order number.
+    steps:
+      - collect: order_number
+        description: The user's order number.
+      - action: action_mcp_lookup_order
+      - action: utter_order_status_result
+```
+
+For a full walkthrough of setting up and calling MCP tools, see [MCP Tools](/pro/guides/mcp-tools).
+
+## A2A agents
+
+[Agent-to-Agent (A2A)](https://a2a-protocol.org/latest/#what-is-a2a-protocol) is an open protocol for inter-agent communication. Maestro can invoke other Rasa agents — or any A2A-compatible agent — as sub-agents, delegating a task and receiving a structured response.
+
+### Expose your Rasa agent as an A2A endpoint
+
+To make your Rasa agent callable by other orchestrators, add `a2a_server` to `endpoints.yml`:
+
+```yaml endpoints.yml
+a2a_server:
+  port: 5056
+```
+
+Rasa will expose an A2A-compatible endpoint on port 5056. Other Maestro instances or orchestration layers can then discover and invoke this agent using its A2A address.
+
+### Register an external A2A agent
+
+To call another agent as a sub-agent from your Maestro deployment, add it to `endpoints.yml` as a named agent endpoint:
+
+```yaml endpoints.yml
+action_endpoint:
+  url: http://localhost:5055/webhook
+
+a2a_server:
+  port: 5056
+
+# External A2A sub-agent
+agents:
+  billing_agent:
+    url: http://billing-service:5056
+  account_agent:
+    url: http://account-service:5056
+```
+
+<Note>
+  Full A2A sub-agent configuration and the flow syntax for referencing named A2A agents will be documented when the complete Maestro multi-agent API is finalized.
+</Note>
+
+## Custom Python actions
+
+Any Python action defined in your `actions/actions.py` file can act as a tool step inside a flow. Custom actions are the most flexible option: they can call any API, transform data, set multiple slots, or trigger side effects in external systems.
+
+```python actions/actions.py
+from rasa_sdk import Action, Tracker
+from rasa_sdk.executor import CollectingDispatcher
+from rasa_sdk.events import SlotSet
+
+class ActionFetchInvoice(Action):
+    def name(self) -> str:
+        return "action_fetch_invoice"
+
+    def run(self, dispatcher: CollectingDispatcher,
+            tracker: Tracker,
+            domain: dict) -> list:
+        # Retrieve billing_issue slot set earlier in the flow
+        billing_issue = tracker.get_slot("billing_issue")
+
+        # Call your billing API here
+        invoice_found = True  # Replace with real API call
+
+        return [SlotSet("invoice_found", invoice_found)]
+```
+
+Reference the action by name in your flow:
+
+```yaml data/flows.yml
+- action: action_fetch_invoice
+```
+
+For complete documentation on implementing, testing, and deploying custom actions, see [Custom Actions](/pro/guides/custom-actions).
+
+## ReAct filler messages for voice
+
+When Maestro executes a tool call — whether MCP, A2A, or a custom action — there is a gap between the user's last message and the agent's next response. In text channels this is invisible. In voice deployments, it surfaces as silence, which degrades the user experience.
+
+Filler messages solve this. Before executing any tool call, Maestro sends an acknowledgment response to the user — something like "Let me look into that for you." This streams to the user immediately; the full response follows when the tool call completes.
+
+Filler messages are **enabled by default** for all agents. To disable them for a specific agent, add the following to `config.yml`:
+
+```yaml config.yml
+configuration:
+  enable_filler_messages: false
+```
+
+You can customize the filler message text by overriding the `utter_filler_*` responses in `domain.yml`. The default set covers common tool-call scenarios.
+
+<Note>
+  Filler messages were introduced in Rasa Pro 3.16. They apply to ReAct-style sub-agents. For CALM flow-based agents, latency is typically lower because steps execute sequentially rather than all tool calls before any response.
+</Note>
+
+## Learn more
+
+<CardGroup cols={2}>
+  <Card title="Custom Actions" icon="code" href="/pro/guides/custom-actions">
+    Build, test, and deploy Python actions that call external services.
+  </Card>
+  <Card title="MCP Tools" icon="plug" href="/pro/guides/mcp-tools">
+    Full guide to connecting and calling MCP-compatible tool servers.
+  </Card>
+  <Card title="Agent Definition" icon="file-code" href="/pro/maestro/agent-definition">
+    Define the flows and domain that consume the tools you connect.
+  </Card>
+  <Card title="Run Locally" icon="computer" href="/pro/maestro/run-locally">
+    Test your tools and filler messages in the Rasa inspector.
+  </Card>
+</CardGroup>

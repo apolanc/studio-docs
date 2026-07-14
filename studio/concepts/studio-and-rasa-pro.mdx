@@ -1,0 +1,71 @@
+---
+title: "How Rasa Studio Relates to Rasa Pro"
+sidebarTitle: "Studio & Rasa Pro"
+description: "Studio and Rasa Pro are two interfaces for the same underlying engine. Learn when to use each and how they fit together in a shared workflow."
+---
+
+Rasa Studio and Rasa Pro are not two separate products — they are two interfaces for the same conversational AI platform. Both interfaces read and write the same YAML project files, run on the same Rasa engine, and produce the same deployable assistant. The distinction is in who uses them and when: Studio is the no-code visual layer built on top of the Rasa framework, aimed at conversation designers, content authors, and business stakeholders; Rasa Pro is the pro-code interface aimed at developers and engineers who need direct access to the underlying framework.
+
+## Studio Runs on Rasa
+
+A key architectural point: Rasa Studio does not replace Rasa Pro — it runs *on* Rasa. Studio adds a visual layer to your Rasa project. When a conversation designer builds a flow in the Studio flow builder, Studio writes standard Rasa YAML files behind the scenes. When a developer adds a custom Python action in Rasa Pro, that action becomes available to select inside Studio. The two interfaces share the same project, the same flows, and the same trained model.
+
+This means your team never has to choose one interface and abandon the other. A business analyst can refine a response in Studio's CMS at the same time a developer is wiring up a new API integration in Rasa Pro — both changes land in the same project.
+
+## When to Use Each Interface
+
+Different roles and different tasks call for different interfaces. The table below shows which interface is best suited for each part of the development lifecycle.
+
+| Task | Studio | Rasa Pro |
+|---|---|---|
+| Build flows | ✅ Visual flow builder | ✅ YAML editor |
+| Manage responses | ✅ CMS | ✅ `domain.yml` |
+| Custom Python actions | ❌ | ✅ |
+| Configure LLMs | ✅ `config.yml` editor | ✅ `config.yml` |
+| Train models | ✅ Train button | ✅ `rasa train` |
+| Deploy | ❌ | ✅ |
+| Analytics dashboard | ✅ | ❌ |
+| Conversation review | ✅ | ❌ |
+
+A general rule of thumb: reach for Studio when the work is about conversation content, flow logic, or analysis; reach for Rasa Pro when the work involves custom code, deployment infrastructure, or LLM configuration.
+
+## The Collaborative Workflow
+
+The Rasa Platform is designed around a four-stage development lifecycle — Build, Test, Deploy, Review — and both interfaces play a defined role at each stage.
+
+### Build
+
+Studio and Rasa Pro work in parallel during the build phase. Studio lets conversation designers build flows visually, write and manage templated responses in the CMS, and train the assistant with a single button click. Rasa Pro lets developers write custom Python actions for complex business logic, configure LLM providers and RAG services, and set up channel integrations. Custom actions written in Rasa Pro are surfaced inside Studio so they can be reused across flows without any additional configuration.
+
+### Test
+
+Studio's built-in Inspector lets designers step through conversation flows, visualize flow navigation, track slot values, and pinpoint issues without writing code. Rasa Pro complements this with automated end-to-end tests that validate assistant behavior at scale, catch regressions across releases, and verify that custom integrations are working as expected.
+
+### Deploy
+
+Deployment is exclusively a Rasa Pro concern. Rasa Pro supports on-premises, cloud, and Kubernetes deployments with built-in versioning, rollback support, and production monitoring. Studio connects to the running instance once it is deployed, but the deployment itself is managed through Rasa Pro.
+
+### Review
+
+After the assistant is live, Studio's Conversation Review panel gives the whole team access to production conversation logs. Designers and analysts can filter conversations by channel, language, and tag to identify patterns, debug unexpected behavior, and surface improvements. Rasa Pro's monitoring tools provide lower-level visibility — logs, metrics dashboards, and real-time performance data — for engineering teams who need to track infrastructure health.
+
+## A Shared File Structure
+
+Because both interfaces operate on the same underlying project files, collaboration is straightforward. Studio can export any assistant as code, and any Rasa Pro project that follows standard conventions can be imported into Studio. Teams can work in whichever interface suits their role without creating parallel, out-of-sync versions of the assistant.
+
+<CardGroup cols={2}>
+  <Card
+    title="Introduction to Rasa Pro"
+    icon="code"
+    href="/pro/introduction"
+  >
+    Learn about the pro-code interface for developers: custom actions, deployment, LLM configuration, and advanced integrations.
+  </Card>
+  <Card
+    title="CALM: Conversational AI with Language Models"
+    icon="brain"
+    href="/pro/concepts/calm"
+  >
+    Understand the dialogue management system that both Studio and Rasa Pro are built on.
+  </Card>
+</CardGroup>

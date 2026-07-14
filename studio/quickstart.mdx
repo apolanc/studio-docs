@@ -1,0 +1,184 @@
+---
+title: "Build Your First Agent with Rasa Studio"
+sidebarTitle: "Quickstart"
+description: "Create a working AI agent with Rasa Studio in minutes—build flows, collect user input, add branching logic, then train and test."
+---
+
+This quickstart walks you through building a real, working agent from scratch. You'll create a greeting flow and a money transfer flow, add branching logic, train a model, and test the result—all inside Rasa Studio. By the end you'll have a [CALM](/pro/concepts/calm)-based agent ready to iterate on.
+
+## Before you begin
+
+Make sure you have access to a running Rasa Studio instance and an account with the `superuser` or `developer` role. If you need to set up Studio, contact your Rasa account team.
+
+---
+
+<Steps>
+
+  <Step title="Log in and create a new project">
+    1. Open your Rasa Studio URL and log in with your `superuser` or `developer` credentials.
+    2. On the Welcome page, click **Create new project**.
+    3. Give your assistant a descriptive name, for example `transfer_money_assistant`.
+    4. Leave **English** selected as the default language, then click **Create assistant**.
+
+    <Tip>
+      Your assistant name becomes its identifier in the Rasa CLI when you run `rasa studio download`. Choose something short and lowercase with underscores.
+    </Tip>
+  </Step>
+
+  <Step title="Create a welcome flow">
+    Flows are the core building block of every CALM-based agent. Each flow represents a conversation path with a clear purpose. Start with a simple greeting flow.
+
+    1. Navigate to the **Flows** tab in the left sidebar.
+    2. Click **Create flow**.
+    3. Set the flow ID to `welcome`.
+    4. In the **Description** field, enter: `Greet the user and introduce yourself`. This description tells CALM when to trigger the flow.
+    5. Click **Save** to open the flow builder canvas.
+
+    <Note>
+      Flow descriptions are critical. CALM uses them to decide which flow to activate based on what the user says. Write descriptions that are specific and distinct from other flows.
+    </Note>
+
+    **Add a Send Message step:**
+
+    6. Click the **+** icon below the Start step and select **Send message**.
+    7. In the side panel, click **Select or create response**, then **Create new response**.
+    8. Fill in the response form:
+       - **Name:** `greet`
+       - **Text:** `Hello! I'm your assistant, created with Rasa Studio. I'm here to help you with money transfers.`
+       - Enable **Use contextual response rephraser** so the message sounds natural in context.
+    9. Click **Save**.
+  </Step>
+
+  <Step title="Create a money transfer flow">
+    Return to the Flows list and create a second flow to handle money transfers.
+
+    1. Click **Create flow**.
+    2. Set the flow ID to `money_transfer`.
+    3. Add the description: `Ask all the required questions to process a money transfer request from users.`
+    4. Click **Save**.
+
+    **Collect the recipient's name:**
+
+    5. Click **+** and add a **Collect information** step.
+    6. Set the step description to: `This step inquires about the recipient of the payment.`
+    7. Click **Select or create slot → Create slot**:
+       - **Name:** `recipient`
+       - **Type:** `Text`
+    8. Click **Select or create response → Create new response**. The system pre-fills the name as `utter_ask_recipient`.
+       - **Text:** `Who would you like to send money to?`
+    9. Click **Save**.
+
+    **Collect the transfer amount:**
+
+    10. Click **+** and add a second **Collect information** step.
+    11. Set the step description to: `This step inquires about the amount of the payment, in US Dollars.`
+    12. Create a new slot:
+        - **Name:** `amount`
+        - **Type:** `Float` (stores decimal numbers like `50.00`)
+    13. Create a response. The system pre-fills the name as `utter_ask_amount`.
+        - **Text:** `How much money would you like to send (in US Dollars)?`
+    14. Optionally click **Add button** to add quick-reply options like `50`, `500`, `1000`.
+    15. Click **Save**.
+
+    <Tip>
+      Leave **Ask before filling** disabled for both steps. If a user says "Send $50 to Alice," CALM fills both slots from that single message and skips the questions automatically.
+    </Tip>
+  </Step>
+
+  <Step title="Add a logic step for branching">
+    Now check whether the user has sufficient funds using a **Logic** step. For this quickstart you'll mock the check with a simple condition rather than a live API call.
+
+    1. Click **+** after the `amount` collect step and select **Logic**.
+    2. Click on the first (true) branch to configure it.
+    3. Set the condition: `amount` **is less than or equal to** `1000`.
+    4. After the true branch, add a **Collect information** step to confirm the transfer:
+       - **Description:** `This step asks the user to confirm the recipient and the transfer amount.`
+       - **Slot name:** `final_confirmation`, **Type:** `Boolean`
+       - **Response name:** `utter_ask_final_confirmation`, **Text:** `Please confirm that you want to transfer {amount} to {recipient}.`
+       - Enable **Ask before filling** so the assistant always requests confirmation.
+    5. After the Else branch (insufficient funds), add a **Send message** step:
+       - **Response name:** `insufficient_funds`, **Text:** `You don't have sufficient funds to complete this transaction.`
+
+    **Add success and cancel messages:**
+
+    6. After the `final_confirmation` collect step, add another **Logic** step with condition: `final_confirmation` **is** `True`.
+    7. After the true branch, add a **Send message** step:
+       - **Response name:** `transfer_successful`, **Text:** `All done. {amount} USD has been sent to {recipient}.`
+    8. After the Else branch, add a **Send message** step:
+       - **Response name:** `cancel_transfer`, **Text:** `Transfer canceled.`
+
+    <Note>
+      Curly-brace references like `{amount}` and `{recipient}` are slot interpolations—Rasa substitutes the actual values collected earlier in the flow at runtime.
+    </Note>
+  </Step>
+
+  <Step title="Train the assistant">
+    With your flows built, compile a model you can chat with.
+
+    1. Click the **Train** button in the top-right corner of Studio.
+    2. In the training panel, select all flows you want to include—select both `welcome` and `money_transfer`.
+    3. Click **Start training**.
+
+    Studio first validates your flows. If any required fields are missing, you'll see an **Unable to train the assistant** message with a list of flows to fix. Correct any errors and click **Start training** again.
+
+    Once training succeeds, you'll see a green confirmation message.
+
+    <Tip>
+      If training fails unexpectedly, click **Download training log** in the error panel to see the full stack trace from Rasa Pro.
+    </Tip>
+  </Step>
+
+  <Step title="Test in Try Your Assistant">
+    1. Navigate to the **Try Your Assistant** page (accessible from the sidebar or the post-training confirmation screen).
+    2. Type a greeting like `Hello` to trigger the welcome flow.
+    3. Then try `I want to send money` to trigger the money transfer flow.
+    4. Walk through the prompts: provide a recipient name, an amount, and confirm or cancel.
+
+    Enable **Inspector mode** to see detailed event-level information alongside each message—useful for debugging slot filling and flow transitions.
+  </Step>
+
+</Steps>
+
+---
+
+## What your flow looks like as code
+
+Every flow you build in Studio exports as human-readable YAML. Here's what the `money_transfer` flow looks like behind the scenes:
+
+```yaml
+flows:
+  transfer_money:
+    description: Help users send money to friends and family.
+    steps:
+      - collect: recipient
+      - collect: amount
+        description: the number of US dollars to send
+      - action: utter_transfer_complete
+```
+
+You can download the full set of YAML files at any time using the Rasa CLI:
+
+```bash
+rasa studio download transfer_money_assistant
+```
+
+This gives you `flows.yml`, `domain.yml`, `config.yml`, and `endpoints.yml`—all version-controllable and editable in any IDE.
+
+---
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Build Your First Flow" icon="diagram-project" href="/studio/guides/build-your-first-flow">
+    Learn every step type in depth: collect, logic, link, custom actions, and more.
+  </Card>
+  <Card title="Manage Responses" icon="message-lines" href="/studio/guides/manage-responses">
+    Organize, translate, and refine your assistant's responses at scale.
+  </Card>
+  <Card title="Test Your Agent" icon="flask" href="/studio/guides/test-your-agent">
+    Write end-to-end test conversations and track regression across model versions.
+  </Card>
+  <Card title="Set Up Your Assistant" icon="gear" href="/studio/guides/build-your-first-flow">
+    Configure LLMs, action endpoints, and multi-language support.
+  </Card>
+</CardGroup>

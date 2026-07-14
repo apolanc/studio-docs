@@ -1,0 +1,153 @@
+---
+title: "Build Conversational Flows in Rasa Studio"
+sidebarTitle: "Build Flows"
+description: "Learn how to build modular, reusable conversational flows in Rasa Studio using the visual step-by-step flow builder powered by CALM."
+---
+
+Flows are the building blocks of every Rasa assistant. Each flow encapsulates a single unit of business logic—one task your assistant knows how to handle, such as transferring money, resetting a password, or collecting feedback. The visual flow builder in Rasa Studio lets you compose these tasks step by step without writing YAML by hand, while the underlying CALM (Conversational AI with Language Models) engine decides when to trigger each flow based on what the user says.
+
+## What is a flow?
+
+A flow is a self-contained conversation thread. When a user's message matches the intent described in a flow's description, CALM activates that flow and works through its steps in order. Flows can hand off to other flows via links or sub-flow calls, so you can keep each flow tightly focused while building arbitrarily complex assistants from simple, reusable pieces.
+
+Each flow you create produces a corresponding entry in `data/studio_flows.yml` when you download your project. Here is an example of what the `money_transfer` flow looks like in YAML:
+
+```yaml
+flows:
+  money_transfer:
+    description: >
+      Ask all the required questions to process a money transfer
+      request from users.
+    steps:
+      - id: collect_recipient
+        collect: recipient
+        description: This step inquires about the recipient of the payment.
+        ask_before_filling: false
+        next:
+          - id: collect_amount
+      - id: collect_amount
+        collect: amount
+        description: This step inquires about the amount of the payment, in US Dollars.
+        ask_before_filling: false
+        next:
+          - id: check_funds
+      - id: check_funds
+        action: action_validate_sufficient_funds
+        next:
+          - if: has_sufficient_funds
+            then: confirm_transfer
+          - else: insufficient_funds_msg
+      - id: confirm_transfer
+        collect: final_confirmation
+        ask_before_filling: true
+        next:
+          - if: final_confirmation
+            then: success_msg
+          - else: cancel_msg
+      - id: success_msg
+        action: utter_transfer_successful
+      - id: insufficient_funds_msg
+        action: utter_insufficient_funds
+      - id: cancel_msg
+        action: utter_cancel_transfer
+```
+
+## Step types
+
+Rasa Studio provides six step types that cover the full range of conversational patterns:
+
+| Step type | What it does |
+|---|---|
+| **Send message** | Sends a templated response to the user. |
+| **Collect information** | Asks a question and stores the user's answer in a slot. |
+| **Logic** | Branches the flow based on slot values or context conditions. |
+| **Custom action** | Calls an external action server to run arbitrary Python code. |
+| **Link** | Ends the current flow and starts a different flow. |
+| **Call** | Invokes another flow as a sub-flow and returns when it finishes. |
+
+## Create a flow
+
+<Steps>
+  <Step title="Open the flow builder">
+    In the left navigation, select **Flows**. Click **Create flow** in the top-right corner.
+  </Step>
+  <Step title="Name and describe your flow">
+    Give the flow a short, descriptive ID (for example, `money_transfer`). In the **Description** field, write a plain-language sentence that tells the assistant when to trigger this flow—for example: *"Ask all the required questions to process a money transfer request from users."* Click **Save**.
+
+    <Tip>
+      The description is used by CALM to decide when to activate your flow. Write it as a specific task statement rather than a vague label. Unique, precise descriptions reduce the chance of the wrong flow being triggered.
+    </Tip>
+  </Step>
+  <Step title="Review the Start step">
+    Every flow opens with a **Start** step. By default, CALM triggers the flow based on your description. You can also add **Flow guards** here to restrict triggering to explicit links or intent conditions only.
+  </Step>
+  <Step title="Add a Send message step">
+    Click the **+** icon below the Start step and choose **Send message**. In the right panel, click **Select or create response**, then **Create new response**. Enter a response name (for example, `greet`) and the message text. Optionally enable **Use contextual response rephraser** so the LLM varies the phrasing based on conversation context.
+  </Step>
+  <Step title="Add a Collect information step">
+    Click **+** and choose **Collect information**. Fill in the step description, then click **Select or create slot** to define where the user's answer will be stored. Choose a slot type that matches the expected data: `Text` for names and freeform strings, `Float` for numbers, `Boolean` for yes/no answers. Set the response the assistant will use to ask the question.
+  </Step>
+  <Step title="Add a Logic step to branch">
+    Click **+** and choose **Logic**. Define a condition on the first branch (for example, `amount is less_than_or_equal 1000`). Add steps to the matching branch and the **Else** branch to handle both outcomes.
+  </Step>
+  <Step title="Link to another flow (optional)">
+    Click **+** and choose **Link** to transition to a different flow when this one completes, or choose **Call** to invoke a sub-flow and return to the current position when it finishes.
+  </Step>
+  <Step title="Save and train">
+    Your changes are saved automatically as you build. When you are ready to test, click **Train** in the top navigation bar.
+  </Step>
+</Steps>
+
+## System flows
+
+In addition to the flows you create, Rasa includes a set of **system flows** (called *patterns* in the underlying Rasa runtime) that handle situations where conversations go off the expected path. These are built-in and always active—you cannot disable them, but you can customize them.
+
+Common system flows include:
+
+- **`pattern_completed`** — runs after a flow finishes; by default it asks *"What else can I help you with?"*
+- **`pattern_search`** — handles queries that don't match any custom flow; can be wired to the Enterprise Search policy
+- **`pattern_customer_satisfaction`** — collects a CSAT rating after `pattern_completed` detects the user is done
+- **`pattern_clarification`** — asked when CALM cannot determine which flow to activate
+- **`pattern_human_handoff`** — triggers escalation to a live agent
+
+### View system flows
+
+Navigate to the **System Flows** tab on the Flows page to see all built-in flows. A **Customized** label appears next to any flow whose default behavior has been changed.
+
+### Customize a system flow text
+
+<Steps>
+  <Step title="Open the system flow">
+    Click the system flow you want to edit in the System Flows tab.
+  </Step>
+  <Step title="Select the step to change">
+    Click the Send message step whose text you want to override.
+  </Step>
+  <Step title="Create a new message">
+    In the right panel, click the response name and choose **Create message**. Enter the new name and text, then click **Save**. The step now uses your custom text instead of the default.
+  </Step>
+</Steps>
+
+### Override system flow logic
+
+You can restructure a system flow exactly as you would a custom flow—adding Logic steps, extra Collect information steps, or Custom action steps. For example, to skip `pattern_completed`'s follow-up question after a greeting flow, add a Logic step before the message that checks `previous_flow_name is not welcome`, then leave the Else branch empty.
+
+<Note>
+  After modifying a system flow, re-train your assistant for the changes to take effect. To revert, hover over the flow in the System Flows table and click **Reset to default**.
+</Note>
+
+## Tips for well-designed flows
+
+- **One task per flow.** A flow named `book_flight` should handle only flight booking. Splitting concerns across focused flows makes them easier to maintain and easier for CALM to route correctly.
+- **Write descriptive flow descriptions.** CALM uses the description—not just the name—to route conversations. Vague descriptions like *"helps users"* cause mis-routing; specific ones like *"Collect the recipient and amount to process a money transfer"* do not.
+- **Use slot types carefully.** Choosing the wrong slot type (for example, `Text` instead of `Float` for a dollar amount) will cause silent extraction failures. Pick the narrowest type that fits the data.
+- **Prefer Link over Call for terminal transitions.** Use `Link` when you want to transfer to another flow permanently. Use `Call` when you need to return to the parent flow after the sub-flow finishes.
+
+<CardGroup cols={2}>
+  <Card title="Manage Responses" icon="message" href="/studio/guides/manage-responses">
+    Learn how to create, translate, and rephrase the messages your assistant sends.
+  </Card>
+  <Card title="Test Your Agent" icon="flask" href="/studio/guides/test-your-agent">
+    Train your assistant and debug conversations with Inspector mode.
+  </Card>
+</CardGroup>

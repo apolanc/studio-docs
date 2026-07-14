@@ -1,0 +1,51 @@
+---
+title: "Rasa Studio Release Notes and Changelog"
+sidebarTitle: "Changelog"
+description: "A running record of new features, improvements, and bug fixes shipped in each Rasa Studio release, ordered from most recent to oldest."
+---
+
+This page tracks new features, improvements, and bug fixes for Rasa Studio across all releases. Entries are ordered from most recent to oldest. For changes to the underlying Rasa framework and Rasa Pro, see the [Rasa Pro changelog](/pro/reference/changelog).
+
+<Update label="Spring 2026" description="Released April 2026">
+  **Analytics Dashboard**
+
+  Studio now ships a built-in analytics dashboard. No external setup required.
+
+  - **Conversation Volume** — total sessions, split into successful and unsuccessful based on configurable success criteria
+  - **Containment** — conversations handled end-to-end without escalation
+  - **Latency** — average time from user message to assistant reply
+  - **CSAT** — collected automatically via the `pattern_customer_satisfaction` system flow
+
+  Each metric includes a month-over-month comparison. Containment insights surface the user journeys with the lowest rates so you know where to focus. Latency insights show the breakdown over time.
+
+  **Conversation Review Filters**
+
+  New filters for **channel**, **language**, and **tag** in Conversation Review. Filters are additive — stack all three or use one. Reset clears everything at once. Conversations that previously required manual scrolling to find are now a few clicks away.
+
+  **Built-in CSAT Collection**
+
+  The new `pattern_customer_satisfaction` system flow triggers automatically after `pattern_completed` when the user indicates they are done. It collects a `csat_score` slot with two values (satisfied or unsatisfied), responds accordingly, and asks only once per session. The pattern, its responses, and its trigger conditions are all customizable.
+
+  If you already have a custom CSAT flow, populate the standard `csat_score` slot with the allowed values (`satisfied`, `unsatisfied`, `skipped`). Analytics picks it up without any changes to your user experience.
+</Update>
+
+<Update label="More releases coming" description="">
+  Future release notes will appear here.
+</Update>
+
+<CardGroup cols={2}>
+  <Card
+    title="Analytics Dashboard"
+    icon="chart-bar"
+    href="/studio/guides/test-your-agent"
+  >
+    Explore conversation volume, containment, latency, and CSAT metrics in the built-in Studio dashboard.
+  </Card>
+  <Card
+    title="Conversation Review"
+    icon="messages"
+    href="/studio/guides/test-your-agent"
+  >
+    Filter and analyze production conversation logs by channel, language, and tag.
+  </Card>
+</CardGroup>

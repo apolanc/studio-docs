@@ -1,0 +1,122 @@
+{
+  "projectType": "saas",
+  "projectName": "Rasa",
+  "projectDescription": "Rasa is an enterprise agentic AI platform for building, deploying, and managing reliable conversational AI agents — combining a no-code Studio UI with a developer-first pro-code framework powered by CALM and Maestro orchestration.",
+  "theme": "luma",
+  "primaryColor": "#5A17EE",
+  "lightColor": "#5c14ec",
+  "darkColor": "#040404",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Studio",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "studio/what-is-studio",
+              "studio/quickstart"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "studio/guides/build-your-first-flow",
+              "studio/guides/manage-responses",
+              "studio/guides/test-your-agent",
+              "studio/guides/git-connect"
+            ]
+          },
+          {
+            "group": "Concepts",
+            "pages": [
+              "studio/concepts/studio-and-rasa-pro"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "studio/reference/changelog"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Rasa Pro",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "pro/introduction",
+              "pro/quickstart"
+            ]
+          },
+          {
+            "group": "Maestro",
+            "pages": [
+              "pro/maestro/what-is-maestro",
+              "pro/maestro/getting-started",
+              "pro/maestro/agent-definition",
+              "pro/maestro/tools",
+              "pro/maestro/run-locally",
+              "pro/maestro/deploy"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "pro/guides/configure-your-agent",
+              "pro/guides/custom-actions",
+              "pro/guides/mcp-tools"
+            ]
+          },
+          {
+            "group": "Concepts",
+            "pages": [
+              "pro/concepts/calm",
+              "pro/concepts/flows-and-slots",
+              "pro/concepts/conversation-patterns"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "pro/reference/changelog"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "CALM (Conversational AI with Language Models) dialogue system separating language from business logic",
+    "Rasa Studio: no-code visual flow builder for building and testing agents",
+    "Maestro: multi-agent orchestration engine for coordinating agents, tools, and knowledge",
+    "Flows: deterministic, versioned business logic for reliable agent behavior",
+    "Custom Actions: Python SDK for integrating APIs, databases, and external services",
+    "Rasa MCP Tools: IDE copilot integration via Model Context Protocol",
+    "Built-in conversation repair for topic changes, corrections, and interruptions",
+    "Multi-LLM routing to balance latency and cost across providers",
+    "Conversation Analytics with CSAT, containment, latency, and volume metrics",
+    "Voice/IVR support with streaming ASR/TTS and low-latency turn-taking",
+    "On-prem, private cloud, and fully managed deployment options",
+    "Enterprise security: data sovereignty, air-gapped deployments, Keycloak auth"
+  ],
+  "publicApiSurface": [
+    "rasa train — train an assistant model",
+    "rasa run — start the Rasa server",
+    "rasa inspect — interactive debug console",
+    "rasa tools init — set up MCP tools for IDE copilots",
+    "rasa tools run --mode stdio — start MCP server",
+    "rasa init --template calm — scaffold a new CALM project",
+    "rasa studio download <assistant-name> — export Studio project to YAML",
+    "Action SDK: Action, Tracker, CollectingDispatcher, SlotSet",
+    "flows.yml: flow definition DSL (steps: collect, action, link, call, conditions)",
+    "domain.yml: responses, slots, actions, session_config",
+    "config.yml: pipeline (LLMCommandGenerator), policies (FlowPolicy)",
+    "endpoints.yml: tracker_store, event_broker, action_endpoint, model_groups",
+    "Studio GraphQL API (authenticated via Keycloak Client Credentials)",
+    "GET /users/{user_id}/trackers — paginated conversation history",
+    "Conversation Analytics database (direct access for custom dashboards)"
+  ]
+}

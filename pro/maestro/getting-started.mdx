@@ -1,0 +1,126 @@
+---
+title: "Getting Started with Maestro in Rasa Pro"
+sidebarTitle: "Getting Started"
+description: "Install Rasa Pro, configure the orchestration pipeline, and build your first Maestro agent that routes between two sub-agents in minutes."
+---
+
+This guide walks you through the minimum setup needed to run a Maestro-powered agent locally. By the end you will have a working Rasa Pro project with the orchestration pipeline enabled, a routing flow defined, and two named agents Maestro can dispatch to.
+
+## Prerequisites
+
+Before you start, make sure you have:
+
+- **Rasa Pro installed** — follow the [installation guide](https://rasa.com/docs/pro/installation/overview/) if you have not already
+- **A valid license key** — get a free Developer Edition key at [rasa.com](https://rasa.com/rasa-pro-developer-edition-license-key-request/) and set it in your environment:
+  ```bash
+  export RASA_LICENSE="your-rasa-pro-license-key"
+  ```
+- **Basic familiarity with Rasa flows** — the [Rasa Pro tutorial](/pro/quickstart) covers slots, collect steps, and action steps if you need a refresher
+
+## What you will build
+
+You will create an agent that handles two domains: account queries and billing inquiries. Maestro reads the description of each flow and routes the user to the right one automatically — you do not write any routing logic by hand.
+
+```text
+User message
+     │
+     ▼
+Maestro evaluates active flows and descriptions
+     │
+     ├─── "account" intent ──► handle_account flow
+     └─── "billing" intent ──► handle_billing flow
+```
+
+## Project structure
+
+A Maestro project uses the same file layout as any Rasa Pro project. The three files you touch most often are:
+
+| File | Purpose |
+|---|---|
+| `config.yml` | Pipeline components and policies, including which LLM and command generator to use |
+| `data/flows.yml` | Routing logic and task flows — descriptions here drive Maestro's dispatch decisions |
+| `endpoints.yml` | Sub-agent connections, action server URL, and any MCP tool servers |
+
+## Configure the orchestration pipeline
+
+Open `config.yml` (or create it in your project root) and add the following:
+
+```yaml config.yml
+# Enable Maestro orchestration
+recipe: default.v1
+language: en
+
+pipeline:
+  - name: CompactLLMCommandGenerator
+
+policies:
+  - name: FlowPolicy
+```
+
+`CompactLLMCommandGenerator` is the command-generation component that interprets user input and produces internal commands — including decisions about which flow to start. `FlowPolicy` executes those commands against the flow definitions in `flows.yml`.
+
+<Note>
+  Maestro does not require a separate policy. The standard `FlowPolicy` handles orchestration when multiple flows are defined. Multi-agent routing via A2A requires additional configuration in `endpoints.yml` — see [Tools](/pro/maestro/tools).
+</Note>
+
+## Define your routing flows
+
+Add two flows to `data/flows.yml`. The `description` field on each flow is what Maestro reads to decide when to activate it — write descriptions that match the language your users actually use.
+
+```yaml data/flows.yml
+flows:
+  handle_account:
+    description: Handle account inquiries, profile updates, and login help.
+    steps:
+      - collect: account_topic
+        description: What account issue does the user have?
+      - action: action_handle_account
+      - action: utter_account_resolved
+
+  handle_billing:
+    description: Handle billing inquiries, account charges, and invoice requests.
+    steps:
+      - collect: billing_issue
+        description: What billing issue does the user have?
+      - action: action_handle_billing
+      - action: utter_billing_resolved
+```
+
+## Connect sub-agent endpoints
+
+If your agents run as separate services, register them in `endpoints.yml`:
+
+```yaml endpoints.yml
+action_endpoint:
+  url: http://localhost:5055/webhook
+```
+
+For A2A sub-agents or MCP tools, see [Connect Tools to Your Maestro Agent](/pro/maestro/tools).
+
+## Run your agent
+
+With configuration in place, train and start your agent:
+
+```bash
+rasa train
+rasa inspect
+```
+
+The inspector opens in your browser and lets you test routing in real time. Type a message about billing and watch Maestro activate `handle_billing`; type something about your account and `handle_account` activates instead. The active flow and current slot values appear in the right-hand panel.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Agent Definition" icon="file-code" href="/pro/maestro/agent-definition">
+    Learn how flows, domain, and config work together to define a complete agent.
+  </Card>
+  <Card title="Tools" icon="wrench" href="/pro/maestro/tools">
+    Connect MCP tools and A2A agents to extend what Maestro can do.
+  </Card>
+  <Card title="Run Locally" icon="computer" href="/pro/maestro/run-locally">
+    Step-by-step instructions for training, running, and testing locally.
+  </Card>
+  <Card title="Deploy" icon="cloud" href="/pro/maestro/deploy">
+    Take your Maestro agent from local development to production.
+  </Card>
+</CardGroup>

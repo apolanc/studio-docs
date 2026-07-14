@@ -1,72 +1,116 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
-  "name": "Mintlify Starter Kit",
-  "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
-  },
-  "favicon": "/favicon.svg",
-  "navigation": {
-    "pages": [
-      {
-        "group": "Getting Started",
-        "pages": [
-          "index",
-          "quickstart"
-        ]
-      }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs",
-          "icon": "book-open-cover"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog",
-          "icon": "newspaper"
-        }
-      ]
-    }
-  },
+  "name": "Rasa",
+  "theme": "luma",
   "logo": {
-    "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "light": "https://media.brand.dev/d1250d34-690d-41f6-ae54-1357e156add4.svg",
+    "dark": "https://media.brand.dev/d1250d34-690d-41f6-ae54-1357e156add4.svg"
+  },
+  "favicon": "https://media.brand.dev/97181b69-9f76-487e-8612-f5476bfb252e.png",
+  "colors": {
+    "primary": "#5A17EE",
+    "light": "#5c14ec",
+    "dark": "#040404"
+  },
+  "appearance": {
+    "default": "light"
+  },
+  "auth": {
+    "type": "password"
   },
   "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://app.mintlify.com"
+      "label": "Get a Demo",
+      "href": "https://rasa.com/connect-with-rasa"
     }
   },
-  "contextual": {
-    "options": [
-      "copy",
-      "view",
-      "chatgpt",
-      "claude",
-      "perplexity",
-      "mcp",
-      "cursor",
-      "vscode"
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Studio",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "studio/what-is-studio",
+              "studio/quickstart"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "studio/guides/build-your-first-flow",
+              "studio/guides/manage-responses",
+              "studio/guides/test-your-agent",
+              "studio/guides/git-connect"
+            ]
+          },
+          {
+            "group": "Concepts",
+            "pages": [
+              "studio/concepts/studio-and-rasa-pro"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "studio/reference/changelog"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Rasa Pro",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "pro/introduction",
+              "pro/quickstart"
+            ]
+          },
+          {
+            "group": "Maestro",
+            "pages": [
+              "pro/maestro/what-is-maestro",
+              "pro/maestro/getting-started",
+              "pro/maestro/agent-definition",
+              "pro/maestro/tools",
+              "pro/maestro/run-locally",
+              "pro/maestro/deploy"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "pro/guides/configure-your-agent",
+              "pro/guides/custom-actions",
+              "pro/guides/mcp-tools"
+            ]
+          },
+          {
+            "group": "Concepts",
+            "pages": [
+              "pro/concepts/calm",
+              "pro/concepts/flows-and-slots",
+              "pro/concepts/conversation-patterns"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "pro/reference/changelog"
+            ]
+          }
+        ]
+      }
     ]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "github": "https://github.com/RasaHQ",
+      "linkedin": "https://www.linkedin.com/company/rasa"
     }
   }
 }

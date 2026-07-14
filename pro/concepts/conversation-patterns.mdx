@@ -1,0 +1,100 @@
+---
+title: "Conversation Patterns: Built-in Recovery in CALM"
+sidebarTitle: "Conversation Patterns"
+description: "Conversation patterns are pre-built system flows that keep your agent on track when users interrupt, correct themselves, or go off-script."
+---
+
+Real conversations rarely follow the happy path. Users change their minds mid-task, ask an unrelated question while a flow is active, correct information they gave two turns ago, or simply go quiet. Handling these situations gracefully requires logic that would be expensive to build from scratch — and easy to get wrong.
+
+Conversation patterns (also called **system flows** in Rasa Studio) are a set of pre-built flows that CALM ships with out of the box. They intercept off-script moments automatically, handle them, and — when appropriate — return the conversation to wherever it left off. You don't need to trigger them manually or build detour logic into your business flows. CALM's dialogue manager activates them when the situation calls for it.
+
+## Categories of conversation patterns
+
+Patterns are grouped by the type of situation they handle.
+
+| Category | Patterns | What they cover |
+|---|---|---|
+| **Conversation repair** | Correction, clarification, interruption | Fixing mistakes, resolving ambiguity, handling mid-flow topic changes |
+| **Conversation navigation** | Cancel, restart, complete | Stopping a task, starting over, finishing successfully |
+| **External support** | Search, human handoff, chitchat | Knowledge base queries, escalation, small talk |
+| **Voice** | Repeat, silence | Replaying the last message, handling no response |
+| **System error** | Internal error, code change, cannot handle | Technical failures, fallback when nothing else applies |
+
+## Key patterns in detail
+
+### `pattern_completed`
+
+Triggered when a flow finishes successfully. The default behavior asks: *"What else can I help you with?"* This gives users a natural invitation to continue the session or confirms the task is done.
+
+You can customize this pattern to vary the follow-up based on which flow just completed — for example, skipping the question after a greeting flow where no real task occurred.
+
+### `pattern_cancelled`
+
+Triggered when a user abandons a flow mid-task — either by saying "never mind," explicitly cancelling, or switching to a completely different topic. The pattern confirms the cancellation and clears the active flow's state. If the user started a new topic, CALM starts the appropriate flow for that instead.
+
+### `pattern_search`
+
+Triggered when the dialogue understanding component cannot route the user's message to any defined flow. By default, this pattern returns a fallback response. You can replace the default action with `action_trigger_search` to connect it to Rasa's Enterprise Search feature, which queries your knowledge base and returns a grounded answer using RAG.
+
+### `pattern_correction`
+
+Handles the case where a user corrects information they provided earlier. For example: *"Actually, send it to Sarah, not Sam."* The pattern updates the relevant slot value and confirms the change with the user before resuming the flow.
+
+### `pattern_chitchat`
+
+Handles small talk — greetings, jokes, questions about the agent's identity — that fall outside any business flow. By default, the Contextual Response Rephraser generates a natural reply. You can customize the response or add conditions to limit what the agent engages with.
+
+### `pattern_customer_satisfaction`
+
+Triggered automatically after `pattern_completed`. Collects a `csat_score` slot from the user. Disabled by default — you enable it by adding the flow to your project. Connecting the score to your analytics or CRM typically requires a custom action.
+
+## How CALM activates patterns
+
+The dialogue manager monitors the conversation continuously for signals that indicate a pattern is needed:
+
+- **Flow completion** — the last step of a flow executes, triggering `pattern_completed`
+- **Explicit cancellation** — the user says something that maps to a cancel command
+- **Topic change** — the LLM generates a `StartFlow` command while a different flow is already active; CALM pauses the active flow, runs the new one, and may resume the original afterward
+- **Correction signal** — the LLM detects the user is revising a previously stated value
+- **No matching flow** — the LLM cannot match the message to any flow, triggering `pattern_search` or `pattern_cannot_handle`
+
+Patterns run as full flows — they have steps, conditions, and actions like any flow you write. After a pattern completes, CALM evaluates whether to resume an interrupted flow. For example, if a user asks a chitchat question mid-transfer, CALM handles the chitchat and then continues from where the transfer flow left off.
+
+## Customizing patterns
+
+Every pattern can be customized. You cannot disable patterns — they're essential to conversation continuity — but you can modify their steps, replace their default responses, and add branching logic.
+
+**To change response text**, replace the default `utter_*` action with your own. In Rasa Pro, override the response in `domain.yml`. In Studio, use the *Create message* option in the system flow editor.
+
+**To add logic**, edit the pattern's steps just as you would any flow. You can add conditions, extra `collect` steps, `call` steps to sub-flows, or custom actions.
+
+A common customization is making `pattern_completed` context-aware. By default, it always asks a follow-up question. You can add a condition so it skips that question after specific flows — for instance, after a greeting where the agent hasn't done any real work yet:
+
+```yaml
+# In your customized pattern_completed steps:
+- if: context.previous_flow_name != "greet"
+  then:
+    - action: utter_ask_what_else
+  else: []
+```
+
+The `context.previous_flow_name` variable is populated automatically by CALM and refers to the flow that triggered the completion event.
+
+<Note>
+  The Contextual Response Rephraser is especially valuable for pattern flows. Because patterns fire in response to dynamic, often unexpected situations, templated responses can sound jarring. Enabling the rephraser for patterns helps the agent sound natural even when recovering from an interruption.
+</Note>
+
+## Patterns in Rasa Studio
+
+In Rasa Studio, conversation patterns appear under the **System Flows** tab on the Flows page. They're visually identical to custom flows — you can inspect their steps, edit responses, and add logic using the same flow builder. After editing a system flow, Studio labels it as **Customized**. You can revert to the default at any time by clicking **Reset to default**.
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="CALM" icon="brain-circuit" href="/pro/concepts/calm">
+    Understand the full dialogue system that activates and manages conversation patterns.
+  </Card>
+  <Card title="Flows & Slots" icon="diagram-project" href="/pro/concepts/flows-and-slots">
+    Learn how to build the business logic flows that patterns wrap around and resume.
+  </Card>
+</CardGroup>

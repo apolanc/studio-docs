@@ -1,0 +1,143 @@
+---
+title: "Manage Agent Responses in Rasa Studio"
+sidebarTitle: "Manage Responses"
+description: "Create, translate, and fine-tune the messages your Rasa assistant sends—including variations, rephrasing, and multilingual content."
+---
+
+Responses are the messages your assistant sends to users. In Rasa, every response is a named template stored in the `domain.yml` file under the `responses` key, with names that follow the `utter_*` convention—for example, `utter_greet` or `utter_ask_recipient`. Rasa Studio gives you a centralized content management interface for creating and editing these templates, adding response variations for naturalness, enabling LLM-powered rephrasing, and managing multilingual content—all without touching YAML directly.
+
+## How responses work
+
+When a flow step fires a **Send message** or **Collect information** action, it references a response by name. At runtime, Rasa looks up that name in the domain, picks one of the available text variants at random, optionally rephrases it with the Contextual Response Rephraser, and sends it to the user. The slot values in curly braces—like `{amount}` or `{recipient}`—are substituted with the actual values stored in slots at that point in the conversation.
+
+## Create a response in the flow builder
+
+<Steps>
+  <Step title="Add a Send message or Collect information step">
+    In the flow builder, click the **+** icon and choose **Send message** or **Collect information**. The right panel opens for that step.
+  </Step>
+  <Step title="Open the response picker">
+    Click **Select or create response**. A modal lists all existing responses you can reuse. To add a brand-new response, click **Create new response**.
+  </Step>
+  <Step title="Name your response">
+    Enter a unique name following the `utter_*` pattern (for example, `utter_ask_amount`). For **Collect information** steps, Studio pre-fills the name as `utter_ask_<slot_name>` automatically.
+  </Step>
+  <Step title="Write the response text">
+    Type the message text in the content field. Reference slot values with curly braces: for example, *"Please confirm that you want to transfer {amount} to {recipient}."*
+  </Step>
+  <Step title="Save the response">
+    Click **Save**. The response is now stored in the domain and linked to this step.
+  </Step>
+</Steps>
+
+## Add response variations
+
+Sending the exact same wording every time makes an assistant feel robotic. You can add multiple text variants to any response; Rasa selects one at random on each turn.
+
+<Steps>
+  <Step title="Open the response editor">
+    Click the response name in any flow step's right panel, or navigate to the **Content** section and open the response from there.
+  </Step>
+  <Step title="Add a variation">
+    Click **Add variation**. A new text field appears alongside the existing one.
+  </Step>
+  <Step title="Write the alternate text">
+    Enter an alternative phrasing with the same meaning. Repeat for as many variants as you need.
+  </Step>
+  <Step title="Save">
+    Click **Save**. Rasa will rotate through all variants randomly across conversations.
+  </Step>
+</Steps>
+
+<Tip>
+  Aim for at least two or three variations on frequently triggered responses like greetings and confirmations. Even small phrasing changes—*"Got it!"* vs. *"Sure thing!"*—make the assistant feel more natural.
+</Tip>
+
+## Contextual response rephraser
+
+The Contextual Response Rephraser passes your template text through an LLM before it is sent to the user. The LLM adapts the wording to fit the current conversation context—adjusting tone, phrasing, or level of detail—while keeping the factual content of the template intact. This produces more natural-sounding responses without requiring you to write dozens of variations manually.
+
+### When to use it
+
+Enable the rephraser on responses where natural-sounding variation matters most: greetings, confirmations, acknowledgements, and follow-up questions. Avoid it on responses that must be exact—legal disclosures, amounts, account numbers, or any text that must not be paraphrased.
+
+### Enable the rephraser on a response
+
+<Steps>
+  <Step title="Open the response editor">
+    Click the response name in any step's right panel.
+  </Step>
+  <Step title="Toggle the rephraser">
+    Check the **Use contextual response rephraser** toggle at the bottom of the response form.
+  </Step>
+  <Step title="Save">
+    Click **Save**. The rephraser applies to this response across every flow that references it.
+  </Step>
+</Steps>
+
+<Note>
+  The contextual response rephraser requires an LLM to be configured in your `config.yml`. If no LLM is configured, the response falls back to sending the raw template text.
+</Note>
+
+## Add buttons to a response
+
+Buttons give users structured choices and reduce free-text input errors on constrained questions like amount selection.
+
+<Steps>
+  <Step title="Open the response editor">
+    Open the response you want to add buttons to.
+  </Step>
+  <Step title="Click Add button">
+    Click **Add button** at the bottom of the response form.
+  </Step>
+  <Step title="Enter button details">
+    Enter a **Title** (the label the user sees, for example `$50`). Leave the **Payload** field empty if you want the button title itself to be treated as the user's utterance, or enter a custom payload string.
+  </Step>
+  <Step title="Add more buttons">
+    Click **Add another button** to add further options, then click **Save**.
+  </Step>
+</Steps>
+
+## Multilingual responses
+
+Rasa uses the [BCP 47 standard](https://www.rfc-editor.org/info/bcp47) for language codes (for example, `en` for English, `de` for German, `pt-BR` for Brazilian Portuguese). When a user interacts with the assistant in a supported language, Rasa serves the response text for that language automatically, falling back to the default language if a translation is missing.
+
+### Add a language to your assistant
+
+<Steps>
+  <Step title="Open Assistant Settings">
+    In the left navigation, go to **Assistant settings**, then click the **Assistant language** tab.
+  </Step>
+  <Step title="Set the default language">
+    Your default language is the primary language and the fallback for missing translations. To change it, select the new language from the **Default language** dropdown.
+
+    <Warning>
+      Changing the default language requires you to provide a complete set of response content in that language before you can train. Existing content in the old default language is not automatically translated.
+    </Warning>
+  </Step>
+  <Step title="Add additional languages">
+    Type a language name or code in the **Additional languages** field (for example, type *"Port"* to filter Portuguese variants), select the appropriate entry, and click **Save**.
+  </Step>
+  <Step title="Add a custom language">
+    If the language you need is not listed, click **Add custom language** and enter a BCP 47 language key and a display name manually. Use `x-<code>` for private-use variants, for example `x-de-formal` for a formal German register.
+  </Step>
+</Steps>
+
+### Add translations to a response
+
+After adding a language, open any response in the editor. A language selector appears at the top of the form. Switch to the new language and enter the translated text. You can also add variations and enable the rephraser per language independently.
+
+## Manage responses from the Content section
+
+Rather than editing responses one step at a time inside a flow, you can manage all responses from the centralized **Content** section (sometimes labeled **CMS**) in the Studio navigation. This view lists every `utter_*` response in your domain, lets you filter by language, and lets you edit text, add variations, and toggle the rephraser—all in one place. This is the most efficient way to do a bulk translation pass or a brand-voice review.
+
+{/* TODO: Add screenshot of the response editor showing the variation fields and rephraser toggle */}
+
+<CardGroup cols={2}>
+  <Card title="Build Flows" icon="diagram-project" href="/studio/guides/build-your-first-flow">
+    Learn how to create flows and wire responses into conversational steps.
+  </Card>
+  <Card title="Test Your Agent" icon="flask" href="/studio/guides/test-your-agent">
+    Train your assistant and verify responses in the Try Your Assistant panel.
+  </Card>
+</CardGroup>

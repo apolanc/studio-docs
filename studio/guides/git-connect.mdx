@@ -1,0 +1,149 @@
+---
+title: "Connect Rasa Studio to a Git Repository"
+sidebarTitle: "Git Connect"
+description: "Sync your Rasa Studio project with a Git repository for version control, pull-request code review, and automated CI/CD deployment pipelines."
+---
+
+Rasa Studio is the primary authoring surface for building conversational flows, but the underlying representation of your assistant is a set of YAML files. Git Connect bridges the Studio authoring experience with professional software-delivery workflows: your team can review flow changes as pull requests, track history with commits, and trigger automated deployments through a CI/CD pipeline—all using the same tools you use for the rest of your codebase.
+
+<Note>
+  Full Git Connect UI configuration is coming in a future release. The CLI download workflow described on this page is available today.
+</Note>
+
+## Why connect to Git?
+
+| Use case | Benefit |
+|---|---|
+| **Team collaboration** | Multiple developers can work on flows in separate branches and merge changes through a review process. |
+| **Code review** | Generated YAML diffs are human-readable—reviewers can see exactly what changed in a flow, response, or slot definition. |
+| **Automated deployment** | A CI/CD pipeline can pick up a merged branch, run `rasa train`, and deploy a new model without manual steps. |
+| **Audit trail** | Git history gives you a complete record of who changed what and when, complementing the version history inside Studio. |
+| **Local experimentation** | Download your assistant, make changes that are not yet supported in the Studio UI, and re-upload or train locally. |
+
+## Download your project with the CLI
+
+The Rasa CLI lets you pull the current state of any Studio assistant to your local machine. You need Rasa Pro 3.7.0 or newer; Rasa Pro 3.9.8 or newer is recommended to also download `endpoints.yml` and `config.yml`.
+
+<Steps>
+  <Step title="Create a local directory">
+    Create and enter a directory where the downloaded files will be placed.
+
+    ```bash
+    mkdir my-assistant
+    cd my-assistant
+    ```
+  </Step>
+  <Step title="Configure the CLI to connect to Studio">
+    Run the config command and provide your Studio URL when prompted.
+
+    ```bash
+    rasa studio config
+    ```
+  </Step>
+  <Step title="Log in to Studio">
+    Authenticate as a user with the `developer` or `superuser` role.
+
+    ```bash
+    rasa studio login
+    ```
+  </Step>
+  <Step title="Download the assistant">
+    Replace `<assistant-name>` with the exact name of your assistant as shown in Studio.
+
+    ```bash
+    rasa studio download <assistant-name>
+    ```
+
+    Run `rasa studio download --help` to see all available flags, including options to target a specific model version.
+  </Step>
+</Steps>
+
+## Files produced
+
+After the download completes, your directory contains:
+
+```
+my-assistant/
+├── endpoints.yml
+├── config.yml
+├── domain.yml
+└── data/
+    ├── studio_flows.yml
+    └── studio_nlu.yml
+```
+
+| File | Contents |
+|---|---|
+| `config.yml` | NLU pipeline, Core policies, LLM configuration, and embedding settings. |
+| `endpoints.yml` | Tracker store, event broker, NLG server, and action server URLs. |
+| `domain.yml` | Slot definitions, response templates (`utter_*`), and custom action names. |
+| `data/studio_flows.yml` | All flows built in Studio, serialized as CALM-compatible YAML. |
+| `data/studio_nlu.yml` | NLU training examples created in Studio. |
+
+## What you can change in YAML only
+
+Most of your assistant design happens in Studio, but certain capabilities require editing the downloaded files directly:
+
+- **Tracing (Observability)** — configure distributed tracing exporters in `endpoints.yml`
+- **IVR channel with AudioCodes** — add the AudioCodes channel configuration
+- **End-to-end tests** — author E2E test stories that exercise full conversation paths
+- **Secrets and PII management** — configure redaction and vault integrations
+- **Markers** — annotate conversations with business-level event markers for analytics
+- **Custom Information Retrieval** — replace or extend the default vector search components
+- **Conversation tracking** — add custom tracker store backends or event broker configurations
+- **Generation prompts** — add `generation_prompt` keys directly inside flow YAML for fine-grained LLM prompt control
+
+## Round-trip workflow
+
+The recommended workflow for teams using Git with Rasa Studio is:
+
+<Steps>
+  <Step title="Build and iterate in Studio">
+    Use the visual flow builder for the majority of your conversational design work. Train and test inside Studio as you go.
+  </Step>
+  <Step title="Download to a feature branch">
+    When you are ready to commit, download the assistant to a local Git repository branch.
+
+    ```bash
+    git checkout -b feature/add-payment-flow
+    rasa studio download <assistant-name>
+    git add .
+    git commit -m "Add payment flow with amount validation"
+    git push origin feature/add-payment-flow
+    ```
+  </Step>
+  <Step title="Review and merge">
+    Open a pull request. Reviewers can inspect the YAML diff in `data/studio_flows.yml` and `domain.yml` to understand exactly what changed.
+  </Step>
+  <Step title="Train and deploy">
+    After merging, run `rasa train` in your CI/CD pipeline or locally to produce a deployable model.
+
+    ```bash
+    rasa train
+    ```
+
+    For advanced debugging of a locally trained model, use:
+
+    ```bash
+    rasa inspect
+    ```
+  </Step>
+  <Step title="Apply YAML-only changes">
+    If you need to configure tracing, PII management, or other capabilities that are not yet available in the Studio UI, edit the downloaded files directly in your editor, commit those changes to the branch, and train locally using `rasa train`.
+  </Step>
+</Steps>
+
+<Tip>
+  Pin the Rasa Pro version in your CI/CD environment to match the version used in Studio to avoid training discrepancies between local and Studio-trained models.
+</Tip>
+
+{/* TODO: Add screenshot of Git Connect settings panel when the UI feature ships */}
+
+<CardGroup cols={2}>
+  <Card title="Test Your Agent" icon="flask" href="/studio/guides/test-your-agent">
+    Learn how to train in Studio and debug before downloading your project.
+  </Card>
+  <Card title="Build Flows" icon="diagram-project" href="/studio/guides/build-your-first-flow">
+    Build the flows that will be downloaded and version-controlled.
+  </Card>
+</CardGroup>

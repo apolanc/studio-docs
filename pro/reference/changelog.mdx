@@ -1,0 +1,90 @@
+---
+title: "Rasa Pro Release Notes and Changelog"
+sidebarTitle: "Changelog"
+description: "A running record of new features, improvements, and fixes across every Rasa Pro release — most recent version first."
+---
+
+This page tracks new features, improvements, and fixes across Rasa Pro releases. The most recent release appears first.
+
+<Update label="Rasa Pro 3.16 — Spring 2026" description="Released April 2026">
+
+**Rasa MCP Tools**
+
+Rasa MCP Tools (currently in beta) is a local MCP server that connects your IDE's built-in copilot directly to your Rasa project. Supported IDEs include Cursor, VS Code Agent Mode, Claude Code, and JetBrains. Once connected, your copilot can inspect your project structure, write and validate new sub-agents and flows against your domain, train your model, and debug runtime issues using logs and conversation context.
+
+Set up runs once:
+
+```bash
+rasa tools init
+```
+
+Configuration is saved to `.rasa/tools.yaml`. Most IDEs start the server automatically on the next session.
+
+---
+
+**Analytics in Studio**
+
+Studio now ships with a built-in analytics dashboard — no external setup or third-party integration required. The dashboard surfaces the metrics teams most often need:
+
+- Total conversation sessions
+- Containment rate (with month-over-month comparison)
+- Average latency (with trend breakdown over time)
+- CSAT score
+
+Containment insights highlight the user journeys with the lowest containment rates so you know exactly where to focus improvement efforts.
+
+---
+
+**Built-in CSAT Collection**
+
+Collecting satisfaction scores after a conversation no longer requires a custom flow. A new system pattern, `pattern_customer_satisfaction`, triggers automatically after `pattern_completed` when the user signals they are done. It:
+
+- Collects a `csat_score` slot with two values: `satisfied` or `unsatisfied`
+- Responds to the user based on their score
+- Asks only once per session
+
+The pattern, its responses, and its trigger conditions are all customizable. If you already have a custom CSAT flow, populate the standard `csat_score` slot with the allowed values — Analytics picks it up without any changes to your user experience.
+
+---
+
+**ReAct Filler Messages (Voice)**
+
+ReAct agents that call multiple tools before responding can produce several seconds of silence in voice channels. Rasa Pro 3.16 adds filler message support to address this. Before executing tool calls, the agent sends an acknowledgment message (for example, "Let me pull up those details.") that streams to the user immediately. The full response follows once all tool calls complete.
+
+Filler messages are **on by default**. To disable them for a specific agent, set the following in your agent configuration:
+
+```yaml
+configuration:
+  enable_filler_messages: false
+```
+
+---
+
+**New Model Support: GPT-5.1, GPT-5.2, and Claude Sonnet 4.5**
+
+Rasa Pro 3.16 ships optimized command generator prompt templates for GPT-5.1, GPT-5.2, and Claude Sonnet 4.5. Benchmarks show that GPT-5.2 and the latest Claude models now outperform GPT-4o on command generation accuracy.
+
+Set the model in `endpoints.yml` and the correct prompt template is selected automatically — no manual prompt configuration required.
+
+---
+
+**Session Management Overhaul**
+
+Sessions received a full overhaul in this release:
+
+- Every session now carries a **UUID on all events**, giving tracking and analytics a reliable identifier
+- Sessions end with explicit states: `ConversationInactive` (the session is resumable) or `SessionEnded` (the session is permanently closed) — rather than timing out ambiguously
+- A new `start_session_after_expiry` config option controls behavior when a session expires
+- A new admin endpoint `GET /users/{user_id}/trackers` provides paginated conversation history per user
+
+---
+
+**Multilingual Voice in a Single Deployment**
+
+ASR and TTS now reconfigure at runtime based on the built-in language slot, so a single Rasa deployment can support multiple languages without requiring a separate deployment per language.
+
+</Update>
+
+<Update label="Coming soon" description="">
+  Future release notes will appear here as new versions ship.
+</Update>

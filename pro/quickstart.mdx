@@ -1,0 +1,198 @@
+---
+title: "Get Started with Rasa Pro in 10 Minutes"
+sidebarTitle: "Quickstart"
+description: "Install Rasa Pro, scaffold a CALM agent project, train your first model, and hold your first real conversation — all in under 10 minutes."
+---
+
+This guide takes you from zero to a working CALM agent as fast as possible. You'll install Rasa Pro, scaffold a project from a template, train your model, and talk to your agent in the browser — no prior Rasa experience required.
+
+By the end you'll have a running money-transfer agent that handles free-form conversation, topic changes, and corrections automatically.
+
+<Steps>
+
+<Step title="Get a free license key">
+
+Rasa Pro requires a license key. The **Developer Edition** is free and covers up to 1,000 conversations per month.
+
+[Request your Developer Edition license key →](https://rasa.com/rasa-pro-developer-edition-license-key-request/)
+
+You'll receive your key by email. Keep it handy — you'll set it as an environment variable in the next step.
+
+</Step>
+
+<Step title="Install Rasa Pro">
+
+Create a Python virtual environment (Python 3.10–3.12 recommended) and install Rasa:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+
+pip install rasa
+```
+
+Set your license key in the environment. Rasa reads this variable at startup:
+
+```bash
+# Linux / macOS
+export RASA_LICENSE="your-rasa-pro-license-key"
+
+# Windows
+setx RASA_LICENSE your-rasa-pro-license-key
+```
+
+<Note>
+  On Windows, `setx` writes the variable permanently for new command-prompt sessions. Open a fresh terminal after running it so the value is available.
+</Note>
+
+Verify the installation:
+
+```bash
+rasa --version
+```
+
+You should see a version string that includes `Rasa Pro`.
+
+</Step>
+
+<Step title="Scaffold a project">
+
+Navigate to an empty directory and initialise a new project from the CALM template:
+
+```bash
+mkdir my-rasa-agent && cd my-rasa-agent
+rasa init --template calm
+```
+
+The scaffold creates the following files:
+
+| File | Purpose |
+|------|---------|
+| `data/flows.yml` | Flow definitions — the business logic your agent can execute |
+| `domain.yml` | Slots, responses, and action declarations |
+| `config.yml` | Pipeline and LLM provider configuration |
+| `actions/actions.py` | Custom Python actions |
+| `endpoints.yml` | Action server and channel endpoint configuration |
+
+Open the project in your IDE to explore the files before training.
+
+**Understanding the transfer money flow**
+
+The template includes a `transfer_money` flow that you'll use to explore CALM. Here's its definition in `data/flows.yml`:
+
+```yaml
+flows:
+  transfer_money:
+    description: Help users send money to friends and family.
+    steps:
+      - collect: recipient
+      - collect: amount
+        description: the number of US dollars to send
+      - action: utter_transfer_complete
+```
+
+The `description` tells CALM when to activate this flow — when a user says something like "I need to send money," CALM recognises the match. The `steps` define the business logic: collect a recipient, collect an amount, then send a confirmation response.
+
+Slots hold the information your agent collects during a conversation. The `recipient` slot in `domain.yml` looks like this:
+
+```yaml
+slots:
+  recipient:
+    type: text
+    mappings:
+      - type: from_llm
+```
+
+The `from_llm` mapping tells Rasa to use the language model to extract the slot value from what the user says — so "send fifty dollars to Jen" correctly populates both `amount` and `recipient` in a single turn.
+
+</Step>
+
+<Step title="Train your agent">
+
+Train the model. Rasa compiles your flows, domain, and configuration into a model artifact:
+
+```bash
+rasa train
+```
+
+Training typically takes one to three minutes. You'll see a `models/` directory created when it completes.
+
+<Note>
+  The tutorial template uses a fine-tuned LLM hosted by Rasa, so you don't need an LLM provider API key for this quickstart. For your own projects, set an `OPENAI_API_KEY` or configure a different provider in `config.yml`.
+</Note>
+
+</Step>
+
+<Step title="Talk to your agent">
+
+Start the interactive inspector, which opens a chat UI in your browser:
+
+```bash
+rasa inspect
+```
+
+Rasa will print a local URL (default `http://localhost:5005`). Open it and start a conversation.
+
+**Happy path — step by step**
+
+> **You:** I want to send money  
+> **Agent:** Who would you like to send money to?  
+> **You:** to Jen  
+> **Agent:** How much would you like to send?  
+> **You:** $50  
+> **Agent:** Please confirm: you want to transfer $50.0 to Jen?  
+> **You:** yes  
+> **Agent:** All done. $50.0 has been sent to Jen.
+
+**All information at once**
+
+> **You:** I want to send 100 dollars to Joe  
+> **Agent:** Please confirm: you want to transfer $100.0 to Joe?  
+> **You:** yes  
+> **Agent:** All done. $100.0 has been sent to Joe.
+
+**Change of mind mid-flow**
+
+> **You:** I need to send $50  
+> **Agent:** Who would you like to send money to?  
+> **You:** Jen  
+> **Agent:** Please confirm: you want to transfer $50.0 to Jen?  
+> **You:** actually no, 60  
+> **Agent:** Ok, I corrected the amount.  
+> **Agent:** Please confirm: you want to transfer $60.0 to Jen?  
+> **You:** yes  
+> **Agent:** All done. $60.0 has been sent to Jen.
+
+CALM handles the correction automatically — no special code required. This built-in conversational awareness is part of what makes CALM different from intent-based or ReAct-style systems.
+
+</Step>
+
+</Steps>
+
+## What You Just Built
+
+In under 10 minutes you:
+
+1. Installed Rasa Pro with a free license
+2. Scaffolded a CALM project from a template
+3. Trained a dialogue model
+4. Talked to an agent that handles free-form input, slot collection, confirmations, and mid-flow corrections
+
+The agent works reliably across all three conversation patterns above because CALM separates LLM understanding from business logic execution. The LLM interprets what the user means; the flow defines what the agent does about it.
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="What is Maestro?" icon="star" href="/pro/maestro/what-is-maestro">
+    Learn how to orchestrate multiple agents, tools, and knowledge sources in a single Rasa deployment.
+  </Card>
+  <Card title="Configure Your Agent" icon="sliders" href="/pro/guides/configure-your-agent">
+    Choose your LLM provider, tune conversation behaviour, and configure channels.
+  </Card>
+  <Card title="Custom Actions" icon="python" href="/pro/guides/custom-actions">
+    Write Python actions that call APIs, set slots, and send rich responses from within your flows.
+  </Card>
+  <Card title="MCP Tools" icon="wrench" href="/pro/guides/mcp-tools">
+    Connect your IDE copilot to your Rasa project so you can build and debug with natural language prompts.
+  </Card>
+</CardGroup>

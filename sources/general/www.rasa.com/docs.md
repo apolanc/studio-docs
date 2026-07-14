@@ -1,0 +1,25 @@
+# Source: https://www.rasa.com/docs
+
+On this page
+
+The Rasa Platform helps teams build, test, deploy, and analyze AI agents at scale. Whether launching your first agent or scaling enterprise AI, Rasa is set up to adapt and grow with you.
+
+### Get started[​](https://www.rasa.com/docs/#get-started 'Direct link to Get started')
+
+[Try instantly\\ \\ Hello Rasa Playground\\ \\ Prototype an agent in minutes using natural language in your browser. No setup required.](https://hello.rasa.com/?utm_source=docs&utm_medium=referral&utm_campaign=docs_cta) [Build locallyv3.16+\\ \\ Rasa Tools (MCP)\\ \\ Build and test agents using Rasa specific MCP tools with Cursor, Claude Code, VS Code, or JetBrains IDEs.](https://www.rasa.com/docs/learn/quickstart/pro/)
+
+### Learn More[​](https://www.rasa.com/docs/#learn-more 'Direct link to Learn More')
+
+Grow your understanding of Rasa concepts.
+
+[**Core Concepts**\\ \\ Dive deeper into the concepts behind Rasa.](https://www.rasa.com/docs/learn/concepts/calm/) [**Guides**\\ \\ Have a usecase in mind? Check out our Guides for how Rasa helps you build agents.](https://www.rasa.com/docs/learn/guides/adding-custom-actions/) [**Rasa University**\\ \\ Become a certified Rasa Developer in our hands-on certification course.](https://hellorasa.info/44Vjn49)
+
+### Dive into the Products[​](https://www.rasa.com/docs/#dive-into-the-products 'Direct link to Dive into the Products')
+
+Find detailed guidance for each step of building agents in our product docs.
+
+[**Rasa**\\ \\ The powerful pro-code interface for building agents.](https://www.rasa.com/docs/pro/intro/) [**Studio**\\ \\ The intuitive no-code interface for building agents.](https://www.rasa.com/docs/studio/intro/)
+
+- [Get started](https://www.rasa.com/docs/#get-started)
+- [Learn More](https://www.rasa.com/docs/#learn-more)
+- [Dive into the Products](https://www.rasa.com/docs/#dive-into-the-products)

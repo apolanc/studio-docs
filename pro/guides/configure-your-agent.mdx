@@ -1,0 +1,247 @@
+---
+title: "Configure Your Rasa Agent: config.yml and Endpoints"
+sidebarTitle: "Configure Agent"
+description: "Learn how config.yml, endpoints.yml, and domain.yml work together to control your Rasa Pro agent's pipeline, connections, and memory."
+---
+
+Every Rasa Pro project is shaped by three YAML files: `config.yml`, `endpoints.yml`, and `domain.yml`. Together they control how your agent processes messages, where it stores conversations, which external services it calls, and what responses and data it works with. Understanding what each file does — and which settings matter most — lets you move quickly from a working prototype to a production-ready assistant.
+
+## config.yml — Pipeline and model settings
+
+`config.yml` tells Rasa how to process incoming user messages. It defines the NLP pipeline that turns a user's text into structured commands, the dialogue policies that decide what happens next, and a handful of project-level settings like language and assistant identity.
+
+### Minimal CALM configuration
+
+For most projects, this is everything you need to get started:
+
+```yaml
+recipe: default.v1
+language: en
+
+pipeline:
+  - name: CompactLLMCommandGenerator
+
+policies:
+  - name: FlowPolicy
+```
+
+`recipe: default.v1` selects Rasa's standard graph recipe. `language: en` sets the primary language using a [two-letter ISO 639-1 code](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes). `CompactLLMCommandGenerator` is the LLM-based pipeline component that interprets user messages and produces commands. `FlowPolicy` is the dialogue policy required for CALM-based assistants — it follows the steps you define in `flows.yml` to progress the conversation.
+
+### LLM configuration in the pipeline
+
+You can pass additional settings to `CompactLLMCommandGenerator` to control which LLM and embeddings model it uses, and to apply input limits:
+
+```yaml
+pipeline:
+  - name: CompactLLMCommandGenerator
+    llm:
+      model_group: openai_llm
+    flow_retrieval:
+      embeddings:
+        model_group: openai_embeddings
+    user_input:
+      max_characters: 420
+```
+
+`model_group` references a named group defined in `endpoints.yml` — this is how you point the pipeline at a specific LLM or embeddings provider. `max_characters` caps how much of a user's message is sent to the LLM, which helps control costs and latency.
+
+### Adding multilingual support
+
+Use `language` for your primary language and `additional_languages` to list other supported locales:
+
+```yaml
+language: en
+additional_languages:
+  - de
+  - fr
+```
+
+### Setting a stable assistant ID
+
+The `assistant_id` key gives your assistant a consistent identity. This ID is attached to every conversation event, making it easy to filter analytics and trace conversations back to a specific deployment.
+
+```yaml
+assistant_id: my_banking_assistant
+```
+
+<Tip>
+  Always set `assistant_id` explicitly. If you omit it or leave the placeholder
+  value, Rasa generates a new random ID every time you run `rasa train`. This
+  makes cross-train analytics comparisons unreliable.
+</Tip>
+
+---
+
+## endpoints.yml — External service connections
+
+`endpoints.yml` defines every external service your agent connects to at runtime: where to store conversations, where to send events, where to find your action server, and which LLM and embedding models to use. You do not need to restart a training run when you change this file — it is read at startup.
+
+### Action endpoint
+
+When a flow reaches a custom action step, Rasa calls your action server. In local development you can run actions in-process using `actions_module`:
+
+```yaml
+action_endpoint:
+  actions_module: actions
+```
+
+For a production deployment, point to an external HTTP action server instead:
+
+```yaml
+action_endpoint:
+  url: http://action-server:5055/webhook
+```
+
+### Tracker store
+
+The tracker store is where Rasa persists every conversation. Use the file-based store for local development:
+
+```yaml
+tracker_store:
+  type: file
+```
+
+Switch to PostgreSQL for staging and production environments:
+
+```yaml
+tracker_store:
+  type: sql
+  dialect: postgresql
+  url: ${TRACKER_DB_URL}
+  db: rasa
+  username: ${TRACKER_DB_USER}
+  password: ${TRACKER_DB_PASSWORD}
+```
+
+### Event broker
+
+The event broker streams conversation events to an external system — useful for analytics pipelines, monitoring dashboards, or data warehouses:
+
+```yaml
+event_broker:
+  type: pika
+  url: ${RABBIT_HOST}
+  username: ${RABBIT_USER}
+  password: ${RABBIT_PASSWORD}
+  queues:
+    - rasa_core_events
+```
+
+### Model groups
+
+`model_groups` is where you declare the LLM and embedding models used by your pipeline components and other features. Entries here are referenced by name from `config.yml`:
+
+```yaml
+model_groups:
+  openai_llm:
+    type: openai
+    model_name: gpt-4o
+    api_key: ${OPENAI_API_KEY}
+  openai_embeddings:
+    type: openai
+    model_name: text-embedding-3-small
+    api_key: ${OPENAI_API_KEY}
+```
+
+### Contextual response rephraser
+
+Rasa's built-in rephraser rewrites your templated responses using an LLM, making them sound more natural and context-aware without requiring you to retrain. Enable it by adding an `nlg` block:
+
+```yaml
+nlg:
+  type: rephrase
+```
+
+The rephraser uses the `model_group` you configure for it and preserves the intent and key facts from your original response template.
+
+---
+
+## domain.yml — Responses, slots, and actions
+
+`domain.yml` defines the universe your agent operates in. It lists every response template your agent can send, every slot (variable) it can store, every custom action it can call, and session-level behaviour.
+
+### Full example
+
+```yaml
+version: "3.1"
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true
+
+responses:
+  utter_greeting:
+    - text: "Hello! How can I help you today?"
+
+slots:
+  user_name:
+    type: text
+    initial_value: null
+
+actions:
+  - action_greet_user
+```
+
+### Responses
+
+The `responses` section holds templated messages your agent can send. Response names must start with `utter_`. You can include text, buttons, images, and custom payloads. Use curly-brace slot references to personalise messages:
+
+```yaml
+responses:
+  utter_ask_final_confirmation:
+    - text: "Please confirm: you want to transfer {amount} to {recipient}?"
+```
+
+### Slots
+
+Slots are variables your agent stores during a conversation. Each slot has a `type` (`text`, `bool`, `float`, `categorical`, `any`) and one or more `mappings` that tell Rasa how to fill it:
+
+```yaml
+slots:
+  recipient:
+    type: text
+    mappings:
+      - type: from_llm
+  has_sufficient_funds:
+    type: bool
+    mappings:
+      - type: controlled
+```
+
+### Actions
+
+List every custom action name your flows reference. This lets Rasa validate your project and ensures the action server knows which actions to register:
+
+```yaml
+actions:
+  - action_check_sufficient_funds
+  - action_fetch_account_balance
+```
+
+### Session configuration
+
+`session_config` controls when a conversation resets:
+
+- `session_expiration_time` — minutes of inactivity before a new session starts (`0` disables expiry)
+- `carry_over_slots_to_new_session` — whether slot values persist into the next session
+
+---
+
+<CardGroup cols={2}>
+  <Card
+    title="Write Custom Actions"
+    icon="code"
+    href="/pro/guides/custom-actions"
+  >
+    Learn how to call APIs, query databases, and run business logic from inside
+    a flow.
+  </Card>
+  <Card
+    title="Set Up MCP Tools"
+    icon="wrench"
+    href="/pro/guides/mcp-tools"
+  >
+    Connect your IDE copilot to your Rasa project for natural-language-driven
+    development.
+  </Card>
+</CardGroup>
