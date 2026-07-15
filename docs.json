@@ -103,7 +103,8 @@
               "pro/reference/changelog"
             ]
           }
-        ]
+        ],
+        "hidden": true
       }
     ]
   },
