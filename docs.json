@@ -3,10 +3,11 @@
   "name": "Rasa",
   "theme": "luma",
   "logo": {
-    "light": "https://media.brand.dev/d1250d34-690d-41f6-ae54-1357e156add4.svg",
-    "dark": "https://media.brand.dev/d1250d34-690d-41f6-ae54-1357e156add4.svg"
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
   },
-  "favicon": "https://media.brand.dev/97181b69-9f76-487e-8612-f5476bfb252e.png",
+  "favicon": "/favicon.svg",
+  "redirects": [],
   "colors": {
     "primary": "#5A17EE",
     "light": "#5c14ec",
@@ -59,52 +60,6 @@
             ]
           }
         ]
-      },
-      {
-        "tab": "Rasa Pro",
-        "groups": [
-          {
-            "group": "Get Started",
-            "pages": [
-              "pro/introduction",
-              "pro/quickstart"
-            ]
-          },
-          {
-            "group": "Maestro",
-            "pages": [
-              "pro/maestro/what-is-maestro",
-              "pro/maestro/getting-started",
-              "pro/maestro/agent-definition",
-              "pro/maestro/tools",
-              "pro/maestro/run-locally",
-              "pro/maestro/deploy"
-            ]
-          },
-          {
-            "group": "Guides",
-            "pages": [
-              "pro/guides/configure-your-agent",
-              "pro/guides/custom-actions",
-              "pro/guides/mcp-tools"
-            ]
-          },
-          {
-            "group": "Concepts",
-            "pages": [
-              "pro/concepts/calm",
-              "pro/concepts/flows-and-slots",
-              "pro/concepts/conversation-patterns"
-            ]
-          },
-          {
-            "group": "Reference",
-            "pages": [
-              "pro/reference/changelog"
-            ]
-          }
-        ],
-        "hidden": true
       }
     ]
   },

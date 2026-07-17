@@ -1,0 +1,30 @@
+name: Docs checks
+
+on:
+  pull_request:
+    paths:
+      - "**/*.mdx"
+      - "**/*.md"
+      - "docs.json"
+      - ".github/workflows/docs-checks.yml"
+  push:
+    branches: [main]
+
+jobs:
+  broken-links:
+    name: Broken links & redirects
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Mintlify CLI
+        run: npm install -g mint
+
+      - name: Check internal links, anchors, and redirects
+        run: mint broken-links --check-anchors --check-redirects

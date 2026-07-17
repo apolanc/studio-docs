@@ -141,10 +141,38 @@ New release notes go at the **top** of the file. Each entry uses:
 
 ---
 
+## Migration Readiness (Docusaurus → Mintlify)
+
+The bulk Docusaurus migration is a **later phase** (the "straight swap, no restructuring" pass). We do **not** migrate content now, but every Phase 1 decision must keep that migration mechanical. The codemod and the 14 custom-component rebuilds run against the **Docusaurus source repo**, not this repo — the `sources/` folder here is a rendered scrape (kept in `.mintignore`, never built), useful only as a content reference.
+
+To keep the later migration a near-identity path map, follow these conventions now:
+
+**URL / path scheme — the biggest lever.**
+- Preserve the existing top-level segment names from the live site: `learn/`, `pro/`, `studio/`, `reference/` (current live URLs are `rasa.com/docs/<segment>/...`).
+- Target the **`/docs` base path** at public launch so migrated pages keep their exact URLs (`rasa.com/docs/learn/concepts/calm` stays put) and SEO transfers with minimal redirects.
+- New Phase 1 pages use the same segments (`studio/...`) so they slot into the migrated tree without collisions.
+- Note: auth is **not supported on a `/docs` subpath**, so the gated preview lives on a subdomain/`mintlify.site` URL; the move to `rasa.com/docs` happens at public launch. Expect that one domain change; avoid others.
+
+**Links.** Always use root-relative absolute paths (`/studio/quickstart`), never relative `../x.mdx` links. Docusaurus relative `.mdx` links are the single largest codemod transform (~1,190 occurrences) — new content must not add more.
+
+**Frontmatter remap** (Docusaurus → Mintlify): `id`/`slug` → nav path in `docs.json`; `sidebar_label` → `sidebarTitle`; `title` → `title`; `abstract`/description → `description`. Drop `llms_modules` (Mintlify generates `llms.txt` natively).
+
+**Admonitions:** `:::note|tip|info|warning [title]` → `<Note>`/`<Tip>`/`<Info>`/`<Warning>` with a **bold** first line for the title.
+
+**Code fences:** `lang title="file" {3-4}` → `lang file {3-4}`. Convert `# highlight-next-line` comments to explicit `{n}` line ranges (manual step).
+
+**Diagrams:** Kroki/D2 → Mermaid code fences (native) or pre-rendered images. No third-party diagram plugins.
+
+**Custom components:** the 14 Docusaurus `@theme` components get rebuilt **once** as Mintlify snippets in `/snippets` and imported where needed. `<Chat>` is the proven pilot (~30 LOC). Do not inline raw JSX per page.
+
+**Redirects:** any time a URL changes, add an entry to the `redirects` array in `docs.json`; the ported 301s and the codemod path map also land there. CI runs `mint broken-links --check-redirects`.
+
+---
+
 ## Out of Scope (Phase 1)
 
 The following are explicitly not part of this phase:
 - Version dropdowns (Pro versioning comes later)
 - OpenAPI / REST API reference
-- Migration of existing Docusaurus content
+- Bulk migration of existing Docusaurus content (see **Migration Readiness** above for the conventions that keep it mechanical)
 - Custom CSS or components beyond Mintlify built-ins

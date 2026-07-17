@@ -1,72 +1,51 @@
 ---
-title: "Rasa Docs: Studio and Pro for Enterprise AI Agents"
+title: "Rasa Studio Docs: Build Enterprise AI Agents No-Code"
 sidebarTitle: "Home"
-description: "Official Rasa partner documentation. Use Rasa Studio's visual builder or Rasa Pro's developer framework to design, deploy, and manage enterprise AI agents."
+description: "Official Rasa Studio partner documentation. Use Rasa Studio's visual builder to design, train, test, and deploy enterprise conversational AI agents."
 ---
 
-Rasa is the enterprise platform for building, deploying, and managing reliable conversational AI agents. Whether you prefer a visual no-code approach with **Rasa Studio** or a code-first developer workflow with **Rasa Pro**, this documentation covers everything you need to ship production-grade agents.
+Rasa Studio is the visual, no-code interface for building reliable enterprise conversational AI agents on the Rasa platform. This partner-gated documentation covers everything you need to design flows, manage responses, train models, and ship production-grade agents—without writing code.
 
 <CardGroup cols={2}>
-  <Card title="Rasa Studio" icon="wand-magic-sparkles" href="/studio/what-is-studio">
-    Build and refine agents visually. No code required — design flows, manage responses, and test your assistant all in one place.
+  <Card title="What is Studio 2.0" icon="wand-magic-sparkles" href="/studio/what-is-studio">
+    Understand the visual flow builder, response management, and analytics that make up Rasa Studio.
   </Card>
-  <Card title="Rasa Pro" icon="code" href="/pro/introduction">
-    The developer platform. Write flows in YAML, integrate custom Python actions, and deploy at enterprise scale.
-  </Card>
-</CardGroup>
-
-## What would you like to build?
-
-<CardGroup cols={2}>
   <Card title="Your First Agent" icon="rocket" href="/studio/quickstart">
-    Create and train a working agent in under 10 minutes with the Studio quickstart.
-  </Card>
-  <Card title="Maestro Orchestration" icon="sitemap" href="/pro/maestro/what-is-maestro">
-    Coordinate multiple agents, tools, and knowledge sources with Rasa's new orchestration engine.
-  </Card>
-  <Card title="Build Flows" icon="diagram-project" href="/studio/guides/build-your-first-flow">
-    Learn how to structure conversational logic into modular, reusable flows.
-  </Card>
-  <Card title="Custom Actions" icon="bolt" href="/pro/guides/custom-actions">
-    Extend your agent with Python to call APIs, query databases, and run business logic.
+    Create, train, and test a working agent in under 10 minutes with the Studio quickstart.
   </Card>
 </CardGroup>
 
-## Choose your path
+## What would you like to do?
 
-<Tabs>
-  <Tab title="No-code with Studio">
-    Rasa Studio is the visual interface for building agents. It's designed for conversation designers, business analysts, and anyone who wants to build without writing code.
+<CardGroup cols={2}>
+  <Card title="Build Flows" icon="diagram-project" href="/studio/guides/build-your-first-flow">
+    Structure conversational logic into modular, reusable flows on the drag-and-drop canvas.
+  </Card>
+  <Card title="Manage Responses" icon="comments" href="/studio/guides/manage-responses">
+    Write, edit, and organize your agent's messages from the built-in content management system.
+  </Card>
+  <Card title="Test Your Agent" icon="vial" href="/studio/guides/test-your-agent">
+    Step through conversations with the Inspector and validate behavior before you ship.
+  </Card>
+  <Card title="Connect Git" icon="code-branch" href="/studio/guides/git-connect">
+    Sync assistants between Studio and your local environment with the Rasa CLI.
+  </Card>
+</CardGroup>
 
-    <Steps>
-      <Step title="Learn what Studio can do">
-        Read [What is Studio 2.0](/studio/what-is-studio) to understand the flow builder, response management, and analytics.
-      </Step>
-      <Step title="Build your first agent">
-        Follow the [Studio Quickstart](/studio/quickstart) to create, train, and test a working agent in minutes.
-      </Step>
-      <Step title="Master the core workflows">
-        Explore the [Guides](/studio/guides/build-your-first-flow) to learn how to build flows, manage responses, and connect to Git.
-      </Step>
-    </Steps>
-  </Tab>
-  <Tab title="Code-first with Rasa Pro">
-    Rasa Pro is the developer framework. If you want full control over your agent's logic, integrations, and deployment, start here.
+## Get started with Studio
 
-    <Steps>
-      <Step title="Understand the platform">
-        Read the [Rasa Pro Introduction](/pro/introduction) to learn about CALM, flows, and the developer toolkit.
-      </Step>
-      <Step title="Run your first agent">
-        Follow the [Pro Quickstart](/pro/quickstart) to scaffold a project and train a working agent locally.
-      </Step>
-      <Step title="Explore Maestro">
-        Visit [What is Maestro](/pro/maestro/what-is-maestro) to learn how Rasa's orchestration engine coordinates agents and tools.
-      </Step>
-    </Steps>
-  </Tab>
-</Tabs>
+<Steps>
+  <Step title="Learn what Studio can do">
+    Read [What is Studio 2.0](/studio/what-is-studio) to understand the flow builder, response management, and analytics.
+  </Step>
+  <Step title="Build your first agent">
+    Follow the [Studio Quickstart](/studio/quickstart) to create, train, and test a working agent in minutes.
+  </Step>
+  <Step title="Master the core workflows">
+    Explore the [Guides](/studio/guides/build-your-first-flow) to learn how to build flows, manage responses, test your agent, and connect to Git.
+  </Step>
+</Steps>
 
 <Note>
-  This site is a partner-gated preview of Rasa's new product documentation. If you have questions or need access, contact your Rasa account team.
+  Studio runs on top of Rasa Pro, the developer framework. Studio compiles every flow down to standard Rasa YAML. For the developer platform docs, see the [Rasa Pro documentation](https://www.rasa.com/docs/pro/intro). This site is a partner-gated preview of Rasa's new product documentation—if you have questions or need access, contact your Rasa account team.
 </Note>
